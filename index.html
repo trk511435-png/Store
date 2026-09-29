@@ -9,27 +9,28 @@
 <style>
 body {
 font-family: 'Cairo', sans-serif;
-background-color: #fdfbf7;
+background-color: #fdfaf6;
 }
 .acai-primary { color: #581c40; }
-.acai-bg-primary { background-color: #581c40; }
+.acai-bg { background-color: #581c40; }
+.acai-border { border-color: #f3d9e2; }
 </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 <!-- Header / Branding -->
-<header class="bg-white border-b border-[#f3d9e2] shadow-sm sticky top-0 z-50">
+<header class="bg-white border-b acai-border shadow-sm sticky top-0 z-40">
 <div class="container mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center space-x-3 space-x-reverse">
-<div class="w-12 h-12 rounded-full bg-[#581c40] flex items-center justify-center text-white text-2xl shadow-md">
+<div class="w-12 h-12 rounded-full acai-bg flex items-center justify-center text-white text-2xl shadow-md">
 🍇
 </div>
 <div>
 <h1 class="text-xl font-black acai-primary tracking-wide">Acai Bowls</h1>
-<p class="text-xs text-rose-400 font-semibold">نظام الطلب والدفع النقدي</p>
+<p class="text-xs text-rose-400 font-semibold">قائمة الطلبات والدفع النقدي</p>
 </div>
 </div>
 <div>
-<button onclick="toggleLoyaltyModal()" class="bg-[#fce4ec] hover:bg-[#f8bbd0] text-[#581c40] px-4 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-2 shadow-sm border border-[#f3d9e2]">
+<button onclick="toggleLoyaltyModal()" class="bg-[#fce4ec] hover:bg-[#f8bbd0] text-[#581c40] px-4 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-2 shadow-sm border acai-border">
 <span>🎟️</span> بطاقة الولاء (<span id="loyalty-points">3</span> نقاط)
 </button>
 </div>
@@ -37,40 +38,40 @@ background-color: #fdfbf7;
 </header>
 <!-- Main Container -->
 <main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
-<!-- Products & Menu Section (2 Columns) -->
+<!-- Products & Menu Section -->
 <div class="lg:col-span-2 space-y-6">
 <!-- Category Tabs -->
 <div class="flex gap-2 overflow-x-auto pb-2">
-<button onclick="filterCategory('all')" class="category-btn active px-5 py-2.5 rounded-2xl bg-[#581c40] text-white text-sm font-bold whitespace-nowrap shadow-sm transition">جميع المنتجات</button>
-<button onclick="filterCategory('bowls')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">أكواب الأساي</button>
+<button onclick="filterCategory('all')" class="category-btn active px-5 py-2.5 rounded-2xl acai-bg text-white text-sm font-bold whitespace-nowrap shadow-sm transition">جميع المنتجات</button>
+<button onclick="filterCategory('bowls')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">أكواب الأساي الرئيسية</button>
 <button onclick="filterCategory('toppings')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">الإضافات الأخرى (+1 درهم)</button>
 </div>
 <!-- Products Grid -->
 <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-<!-- Dynamically loaded -->
+<!-- Dynamic Content -->
 </div>
 </div>
-<!-- Order Summary & Checkout Section (1 Column) -->
-<div class="bg-white rounded-3xl shadow-sm border border-rose-100 p-5 flex flex-col h-fit sticky top-20">
-<h2 class="text-lg font-bold border-b border-rose-100 pb-3 mb-4 flex items-center justify-between acai-primary">
+<!-- Order Summary & Checkout Section -->
+<div class="bg-white rounded-3xl shadow-sm border acai-border p-5 flex flex-col h-fit sticky top-20">
+<h2 class="text-lg font-bold border-b acai-border pb-3 mb-4 flex items-center justify-between acai-primary">
 <span>ملخص الطلب</span>
 <span id="item-count" class="bg-rose-100 text-[#581c40] text-xs px-3 py-1 rounded-full font-bold">0 عناصر</span>
 </h2>
 <!-- Cart Items List -->
 <div id="cart-items" class="space-y-3 max-h-64 overflow-y-auto mb-4 divide-y divide-rose-50">
-<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي المفضل لديك!</p>
+<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي أو إضافة!</p>
 </div>
 <!-- Bill Calculations -->
-<div class="border-t border-rose-100 pt-4 space-y-2 text-sm">
+<div class="border-t acai-border pt-4 space-y-2 text-sm">
 <div class="flex justify-between text-slate-600">
 <span>المجموع الفرعي:</span>
 <span id="subtotal">0.00 درهم</span>
 </div>
 <div class="flex justify-between text-slate-600">
-<span>الضريبة (متضمنة):</span>
+<span>الضريبة:</span>
 <span>0.00 درهم</span>
 </div>
-<div class="flex justify-between text-lg font-black acai-primary border-t border-rose-100 pt-2 mt-2">
+<div class="flex justify-between text-lg font-black acai-primary border-t acai-border pt-2 mt-2">
 <span>الإجمالي النهائي:</span>
 <span id="total">0.00 درهم</span>
 </div>
@@ -83,10 +84,10 @@ background-color: #fdfbf7;
 </main>
 <!-- Cash Payment Modal -->
 <div id="cash-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100">
+<div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border acai-border">
 <h3 class="text-xl font-bold acai-primary mb-2">الدفع النقدي (كاش) 💵</h3>
 <p class="text-sm text-slate-500 mb-4">أدخل المبلغ المستلم من العميل لحساب الباقي بدقة.</p>
-<div class="bg-rose-50/60 p-4 rounded-2xl mb-4 space-y-2 border border-rose-100">
+<div class="bg-rose-50/60 p-4 rounded-2xl mb-4 border acai-border">
 <div class="flex justify-between text-sm">
 <span class="text-slate-600 font-semibold">المبلغ المطلوب:</span>
 <span id="modal-total" class="font-black acai-primary text-base">0.00 درهم</span>
@@ -102,7 +103,7 @@ background-color: #fdfbf7;
 </div>
 <div class="flex gap-3">
 <button onclick="closeCashModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 rounded-2xl font-bold transition">إلغاء</button>
-<button onclick="completeOrder()" id="confirm-pay-btn" disabled class="flex-1 acai-bg-primary opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition shadow-md">تأكيد الدفع</button>
+<button onclick="completeOrder()" id="confirm-pay-btn" disabled class="flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition shadow-md">تأكيد الدفع</button>
 </div>
 </div>
 </div>
@@ -132,12 +133,12 @@ background-color: #fdfbf7;
 </div>
 <!-- Success Order & Receipt Modal -->
 <div id="success-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-rose-100">
+<div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border acai-border">
 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
 <h3 class="text-xl font-bold acai-primary mb-1">تم إتمام الطلب بنجاح!</h3>
 <p class="text-sm text-slate-500 mb-4">تم تسجيل الدفع النقدي وإضافة ختم جديد لبطاقة الولاء.</p>
-<div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border border-rose-100 space-y-1"></div>
-<button onclick="closeSuccessModal()" class="w-full acai-bg-primary text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">طلب جديد</button>
+<div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border acai-border space-y-1"></div>
+<button onclick="closeSuccessModal()" class="w-full acai-bg text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">طلب جديد</button>
 </div>
 </div>
 <!-- JavaScript Application Logic -->
@@ -164,7 +165,7 @@ grid.innerHTML = '';
 const filtered = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
 filtered.forEach(product => {
 const card = document.createElement('div');
-card.className = 'bg-white border border-rose-100 rounded-3xl p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer group';
+card.className = 'bg-white border acai-border rounded-3xl p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer group';
 card.onclick = () => addToCart(product.id);
 card.innerHTML = ⁠<div> <div class="w-full h-32 bg-rose-50/50 rounded-2xl flex items-center justify-center text-5xl mb-3 group-hover:scale-105 transition transform border border-rose-100/50"> ${product.image} </div> <h3 class="font-bold acai-primary text-sm mb-1">${product.name}</h3> <p class="text-xs text-slate-400 mb-2">${product.desc}</p> </div> <div class="flex justify-between items-center mt-2 pt-3 border-t border-rose-50"> <span class="font-black acai-primary text-base">${product.price.toFixed(2)} درهم</span> <button class="bg-rose-100 text-[#581c40] text-xs px-3.5 py-2 rounded-xl font-bold group-hover:bg-[#581c40] group-hover:text-white transition shadow-sm">إضافة</button> </div>⁠;
 grid.appendChild(card);
@@ -173,11 +174,11 @@ grid.appendChild(card);
 function filterCategory(category) {
 currentCategory = category;
 document.querySelectorAll('.category-btn').forEach(btn => {
-btn.classList.remove('bg-[#581c40]', 'text-white', 'shadow-sm');
+btn.classList.remove('acai-bg', 'text-white', 'shadow-sm');
 btn.classList.add('bg-white', 'text-slate-600', 'border', 'border-rose-100');
 });
 event.target.classList.remove('bg-white', 'text-slate-600', 'border', 'border-rose-100');
-event.target.classList.add('bg-[#581c40]', 'text-white', 'shadow-sm');
+event.target.classList.add('acai-bg', 'text-white', 'shadow-sm');
 renderProducts();
 }
 function addToCart(productId) {
@@ -208,7 +209,7 @@ const totalEl = document.getElementById('total');
 const checkoutBtn = document.getElementById('checkout-btn');
 container.innerHTML = '';
 if (cart.length === 0) {
-container.innerHTML = ⁠<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي المفضل لديك!</p>⁠;
+container.innerHTML = ⁠<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي أو إضافة!</p>⁠;
 itemCountEl.innerText = ⁠0 عناصر⁠;
 subtotalEl.innerText = ⁠0.00 درهم⁠;
 totalEl.innerText = ⁠0.00 درهم⁠;
@@ -223,14 +224,14 @@ totalItems += item.quantity;
 subtotal += item.price * item.quantity;
 const row = document.createElement('div');
 row.className = 'py-2.5 flex justify-between items-center';
-row.innerHTML = ⁠<div class="flex-grow"> <h4 class="text-xs font-bold acai-primary">${item.name}</h4> <span class="text-xs text-rose-500 font-bold">${(item.price * item.quantity).toFixed(2)} درهم</span> </div> <div class="flex items-center gap-2 bg-rose-50 rounded-xl p-1 border border-rose-100"> <button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">-</button> <span class="text-xs font-bold w-4 text-center acai-primary">${item.quantity}</span> <button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">+</button> </div>⁠;
+row.innerHTML = ⁠<div class="flex-grow"> <h4 class="text-xs font-bold acai-primary">${item.name}</h4> <span class="text-xs text-rose-500 font-bold">${(item.price * item.quantity).toFixed(2)} درهم</span> </div> <div class="flex items-center gap-2 bg-rose-50 rounded-xl p-1 border acai-border"> <button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">-</button> <span class="text-xs font-bold w-4 text-center acai-primary">${item.quantity}</span> <button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">+</button> </div>⁠;
 container.appendChild(row);
 });
 itemCountEl.innerText = ⁠${totalItems} عناصر⁠;
 subtotalEl.innerText = ⁠${subtotal.toFixed(2)} درهم⁠;
 totalEl.innerText = ⁠${subtotal.toFixed(2)} درهم⁠;
 checkoutBtn.disabled = false;
-checkoutBtn.className = "mt-6 w-full acai-bg-primary hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition shadow-md cursor-pointer";
+checkoutBtn.className = "mt-6 w-full acai-bg hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition shadow-md cursor-pointer";
 }
 function openCashModal() {
 const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
@@ -238,7 +239,7 @@ document.getElementById('modal-total').innerText = ⁠${total.toFixed(2)} دره
 document.getElementById('cash-given').value = '';
 document.getElementById('change-amount').innerText = ⁠0.00 درهم⁠;
 document.getElementById('confirm-pay-btn').disabled = true;
-document.getElementById('confirm-pay-btn').className = "flex-1 acai-bg-primary opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
+document.getElementById('confirm-pay-btn').className = "flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
 document.getElementById('cash-modal').classList.remove('hidden');
 }
 function closeCashModal() {
@@ -254,12 +255,12 @@ if (cashGiven >= total) {
 changeEl.innerText = ⁠${change.toFixed(2)} درهم⁠;
 changeEl.className = "text-xl font-black text-emerald-600";
 confirmBtn.disabled = false;
-confirmBtn.className = "flex-1 acai-bg-primary hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition cursor-pointer shadow-md";
+confirmBtn.className = "flex-1 acai-bg hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition cursor-pointer shadow-md";
 } else {
 changeEl.innerText = ⁠المبلغ المدفوع غير كافٍ⁠;
 changeEl.className = "text-xs font-bold text-rose-500";
 confirmBtn.disabled = true;
-confirmBtn.className = "flex-1 acai-bg-primary opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
+confirmBtn.className = "flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
 }
 }
 function completeOrder() {
@@ -267,11 +268,11 @@ const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
 const change = cashGiven - total;
 closeCashModal();
-let receiptHtml = ⁠<div class="font-bold text-slate-700 border-b border-rose-100 pb-1 mb-1">إيصال دفع نقدي - Acai Bowls</div>⁠;
+let receiptHtml = ⁠<div class="font-bold text-slate-700 border-b acai-border pb-1 mb-1">إيصال الدفع النقدي - Acai Bowls</div>⁠;
 cart.forEach(item => {
 receiptHtml += ⁠<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>⁠;
 });
-receiptHtml += ⁠<div class="border-t border-rose-100 pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>⁠;
+receiptHtml += ⁠<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>⁠;
 receiptHtml += ⁠<div class="flex justify-between text-slate-500"><span>المسدد كاش:</span><span>${cashGiven.toFixed(2)} د.إ</span></div>⁠;
 receiptHtml += ⁠<div class="flex justify-between text-emerald-600 font-bold"><span>الباقي للعميل:</span><span>${change.toFixed(2)} د.إ</span></div>⁠;
 document.getElementById('receipt-details').innerHTML = receiptHtml;
