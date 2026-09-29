@@ -9,34 +9,34 @@
 <style>
 body {
 font-family: 'Cairo', sans-serif;
-background-color: #fdfaf6;
+background-color: #fcf8f5;
 }
 .acai-primary { color: #581c40; }
 .acai-bg { background-color: #581c40; }
-.acai-border { border-color: #f3d9e2; }
+.acai-border { border-color: #f1d3e0; }
 </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
-<!-- Header / Branding -->
+<!-- Header & Branding -->
 <header class="bg-white border-b acai-border shadow-sm sticky top-0 z-40">
 <div class="container mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center space-x-3 space-x-reverse">
-<div class="w-12 h-12 rounded-full acai-bg flex items-center justify-center text-white text-2xl shadow-md">
+<div class="w-12 h-12 rounded-full acai-bg flex items-center justify-center text-white text-2xl shadow-md overflow-hidden border-2 border-rose-200">
 🍇
 </div>
 <div>
 <h1 class="text-xl font-black acai-primary tracking-wide">Acai Bowls</h1>
-<p class="text-xs text-rose-400 font-semibold">قائمة الطلبات والدفع النقدي</p>
+<p class="text-xs text-rose-500 font-bold">نظام الكاشير والطلبات المباشرة</p>
 </div>
 </div>
 <div>
-<button onclick="toggleLoyaltyModal()" class="bg-[#fce4ec] hover:bg-[#f8bbd0] text-[#581c40] px-4 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-2 shadow-sm border acai-border">
+<button onclick="toggleLoyaltyModal()" class="bg-rose-50 hover:bg-rose-100 text-[#581c40] px-4 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-2 shadow-sm border acai-border">
 <span>🎟️</span> بطاقة الولاء (<span id="loyalty-points">3</span> نقاط)
 </button>
 </div>
 </div>
 </header>
-<!-- Main Container -->
+<!-- Main Workspace -->
 <main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
 <!-- Products & Menu Section -->
 <div class="lg:col-span-2 space-y-6">
@@ -48,7 +48,7 @@ background-color: #fdfaf6;
 </div>
 <!-- Products Grid -->
 <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-<!-- Dynamic Content -->
+<!-- Dynamically Rendered Products -->
 </div>
 </div>
 <!-- Order Summary & Checkout Section -->
@@ -57,11 +57,11 @@ background-color: #fdfaf6;
 <span>ملخص الطلب</span>
 <span id="item-count" class="bg-rose-100 text-[#581c40] text-xs px-3 py-1 rounded-full font-bold">0 عناصر</span>
 </h2>
-<!-- Cart Items List -->
+<!-- Cart Items -->
 <div id="cart-items" class="space-y-3 max-h-64 overflow-y-auto mb-4 divide-y divide-rose-50">
 <p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي أو إضافة!</p>
 </div>
-<!-- Bill Calculations -->
+<!-- Total Calculation -->
 <div class="border-t acai-border pt-4 space-y-2 text-sm">
 <div class="flex justify-between text-slate-600">
 <span>المجموع الفرعي:</span>
@@ -76,7 +76,7 @@ background-color: #fdfaf6;
 <span id="total">0.00 درهم</span>
 </div>
 </div>
-<!-- Cash Payment Action Button -->
+<!-- Cash Payment Button -->
 <button onclick="openCashModal()" id="checkout-btn" disabled class="mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm">
 إتمام الطلب والدفع نقداً 💵
 </button>
@@ -131,26 +131,75 @@ background-color: #fdfaf6;
 <button onclick="toggleLoyaltyModal()" class="w-full bg-white text-[#581c40] py-3.5 rounded-2xl font-bold hover:bg-rose-50 transition relative z-10 shadow-sm">إغلاق البطاقة</button>
 </div>
 </div>
-<!-- Success Order & Receipt Modal -->
+<!-- Success Order Modal -->
 <div id="success-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border acai-border">
 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
 <h3 class="text-xl font-bold acai-primary mb-1">تم إتمام الطلب بنجاح!</h3>
-<p class="text-sm text-slate-500 mb-4">تم تسجيل الدفع النقدي وإضافة ختم جديد لبطاقة الولاء.</p>
+<p class="text-sm text-slate-500 mb-4">تم تسجيل الدفع النقدي وإضافة ختم لبطاقة الولاء.</p>
 <div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border acai-border space-y-1"></div>
 <button onclick="closeSuccessModal()" class="w-full acai-bg text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">طلب جديد</button>
 </div>
 </div>
-<!-- JavaScript Application Logic -->
+<!-- Script Application Logic -->
 <script>
 const products = [
-{ id: 1, name: 'أساي مقاس صغير', category: 'bowls', price: 3.00, image: '🥣', desc: 'كوب أساي طازج - مقاس صغير' },
-{ id: 2, name: 'أساي مقاس كبير', category: 'bowls', price: 5.00, image: '🍨', desc: 'كوب أساي مشبع - مقاس كبير' },
-{ id: 3, name: 'موز', category: 'toppings', price: 1.00, image: '🍌', desc: 'إضافة شرائح موز طازجة' },
-{ id: 4, name: 'فراولة', category: 'toppings', price: 1.00, image: '🍓', desc: 'إضافة قطع فراولة طازجة' },
-{ id: 5, name: 'توت أزرق', category: 'toppings', price: 1.00, image: '🫐', desc: 'إضافة توت أزرق طبيعي' },
-{ id: 6, name: 'جرانولا', category: 'toppings', price: 1.00, image: '🌾', desc: 'إضافة جرانولا مقرمشة' },
-{ id: 7, name: 'جوز هند', category: 'toppings', price: 1.00, image: '🥥', desc: 'إضافة جوز هند طازج' }
+{
+id: 1,
+name: 'أساي مقاس صغير',
+category: 'bowls',
+price: 3.00,
+image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+desc: 'كوب أساي طازج - مقاس صغير'
+},
+{
+id: 2,
+name: 'أساي مقاس كبير',
+category: 'bowls',
+price: 5.00,
+image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+desc: 'كوب أساي مشبع - مقاس كبير'
+},
+{
+id: 3,
+name: 'موز',
+category: 'toppings',
+price: 1.00,
+image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+desc: 'إضافة شرائح موز طازجة'
+},
+{
+id: 4,
+name: 'فراولة',
+category: 'toppings',
+price: 1.00,
+image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+desc: 'إضافة قطع فراولة طازجة'
+},
+{
+id: 5,
+name: 'توت أزرق',
+category: 'toppings',
+price: 1.00,
+image: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+desc: 'إضافة توت أزرق طبيعي'
+},
+{
+id: 6,
+name: 'جرانولا',
+category: 'toppings',
+price: 1.00,
+image: 'https://images.unsplash.com/photo-1517093788736-2979207af2d1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+desc: 'إضافة جرانولا مقرمشة'
+},
+{
+id: 7,
+name: 'جوز هند',
+category: 'toppings',
+price: 1.00,
+image: 'https://images.unsplash.com/photo-1588611846571-70bf812d6f78?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+desc: 'إضافة جوز هند طازج'
+}
 ];
 let cart = [];
 let currentCategory = 'all';
@@ -165,9 +214,9 @@ grid.innerHTML = '';
 const filtered = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
 filtered.forEach(product => {
 const card = document.createElement('div');
-card.className = 'bg-white border acai-border rounded-3xl p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer group';
+card.className = 'bg-white border acai-border rounded-3xl p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer group overflow-hidden';
 card.onclick = () => addToCart(product.id);
-card.innerHTML = ⁠<div> <div class="w-full h-32 bg-rose-50/50 rounded-2xl flex items-center justify-center text-5xl mb-3 group-hover:scale-105 transition transform border border-rose-100/50"> ${product.image} </div> <h3 class="font-bold acai-primary text-sm mb-1">${product.name}</h3> <p class="text-xs text-slate-400 mb-2">${product.desc}</p> </div> <div class="flex justify-between items-center mt-2 pt-3 border-t border-rose-50"> <span class="font-black acai-primary text-base">${product.price.toFixed(2)} درهم</span> <button class="bg-rose-100 text-[#581c40] text-xs px-3.5 py-2 rounded-xl font-bold group-hover:bg-[#581c40] group-hover:text-white transition shadow-sm">إضافة</button> </div>⁠;
+card.innerHTML = ⁠<div> <div class="w-full h-36 bg-rose-50 rounded-2xl overflow-hidden mb-3 border border-rose-100"> <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"> </div> <h3 class="font-bold acai-primary text-sm mb-1">${product.name}</h3> <p class="text-xs text-slate-400 mb-2">${product.desc}</p> </div> <div class="flex justify-between items-center mt-2 pt-3 border-t border-rose-50"> <span class="font-black acai-primary text-base">${product.price.toFixed(2)} درهم</span> <button class="bg-rose-100 text-[#581c40] text-xs px-3.5 py-2 rounded-xl font-bold group-hover:bg-[#581c40] group-hover:text-white transition shadow-sm">إضافة</button> </div>⁠;
 grid.appendChild(card);
 });
 }
