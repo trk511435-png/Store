@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acai Bowls - نظام الطلب والدفع النقدي</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Cairo', sans-serif;
+background-color: #fdfbf7;
+}
+.acai-primary { color: #581c40; }
+.acai-bg-primary { background-color: #581c40; }
+.acai-border { border-color: #e5b2c3; }
+</style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+<!-- Header / Branding -->
+<header class="bg-white border-b border-[#f3d9e2] shadow-sm sticky top-0 z-50">
+<div class="container mx-auto px-4 py-3 flex justify-between items-center">
+<div class="flex items-center space-x-3 space-x-reverse">
+<div class="w-12 h-12 rounded-full bg-[#581c40] flex items-center justify-center text-white text-2xl shadow-md">
+🍇
+</div>
+<div>
+<h1 class="text-xl font-black acai-primary tracking-wide">Acai Bowls</h1>
+<p class="text-xs text-rose-400 font-semibold">منعش، طبيعي، وصحي</p>
+</div>
+</div>
+<div>
+<button onclick="toggleLoyaltyModal()" class="bg-[#fce4ec] hover:bg-[#f8bbd0] text-[#581c40] px-4 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-2 shadow-sm border border-[#f3d9e2]">
+<span>🎟️</span> بطاقة الولاء (<span id="loyalty-points">3</span> نقاط)
+</button>
+</div>
+</div>
+</header>
+<!-- Main Container -->
+<main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Products & Menu Section (2 Columns) -->
+<div class="lg:col-span-2 space-y-6">
+<!-- Category Tabs -->
+<div class="flex gap-2 overflow-x-auto pb-2">
+<button onclick="filterCategory('all')" class="category-btn active px-5 py-2.5 rounded-2xl bg-[#581c40] text-white text-sm font-bold whitespace-nowrap shadow-sm transition">جميع الأحجام</button>
+<button onclick="filterCategory('bowls')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">أكواب الأساي الأساسية</button>
+<button onclick="filterCategory('toppings')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">الإضافات الخاصة (+1 درهم)</button>
+</div>
+<!-- Products Grid -->
+<div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Products dynamically inserted via JS -->
+</div>
+</div>
+<!-- Order Summary & Checkout Section (1 Column) -->
+<div class="bg-white rounded-3xl shadow-sm border border-rose-100 p-5 flex flex-col h-fit sticky top-20">
+<h2 class="text-lg font-bold border-b border-rose-100 pb-3 mb-4 flex items-center justify-between acai-primary">
+<span>ملخص الطلب</span>
+<span id="item-count" class="bg-rose-100 text-[#581c40] text-xs px-3 py-1 rounded-full font-bold">0 عناصر</span>
+</h2>
+<!-- Cart Items List -->
+<div id="cart-items" class="space-y-3 max-h-64 overflow-y-auto mb-4 divide-y divide-rose-50">
+<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي المفضل لديك!</p>
+</div>
+<!-- Bill Calculations -->
+<div class="border-t border-rose-100 pt-4 space-y-2 text-sm">
+<div class="flex justify-between text-slate-600">
+<span>المجموع الفرعي:</span>
+<span id="subtotal">0.00 درهم</span>
+</div>
+<div class="flex justify-between text-slate-600">
+<span>الضريبة (متضمنة):</span>
+<span>0.00 درهم</span>
+</div>
+<div class="flex justify-between text-lg font-black acai-primary border-t border-rose-100 pt-2 mt-2">
+<span>الإجمالي النهائي:</span>
+<span id="total">0.00 درهم</span>
+</div>
+</div>
+<!-- Cash Payment Action Button -->
+<button onclick="openCashModal()" id="checkout-btn" disabled class="mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm">
+إتمام الطلب والدفع نقداً 💵
+</button>
+</div>
+</main>
+<!-- Cash Payment Modal -->
+<div id="cash-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100">
+<h3 class="text-xl font-bold acai-primary mb-2">الدفع النقدي (كاش) 💵</h3>
+<p class="text-sm text-slate-500 mb-4">أدخل المبلغ المستلم من العميل لحساب الصرف بدقة.</p>
+<div class="bg-rose-50/60 p-4 rounded-2xl mb-4 space-y-2 border border-rose-100">
+<div class="flex justify-between text-sm">
+<span class="text-slate-600 font-semibold">المبلغ المطلوب:</span>
+<span id="modal-total" class="font-black acai-primary text-base">0.00 درهم</span>
+</div>
+</div>
+<div class="mb-4">
+<label class="block text-xs font-bold text-slate-700 mb-1">المبلغ المدفوع من العميل (درهم):</label>
+<input type="number" id="cash-given" oninput="calculateChange()" class="w-full border border-rose-200 rounded-2xl px-4 py-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-[#581c40]" placeholder="0.00">
+</div>
+<div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl mb-6 flex justify-between items-center">
+<span class="font-bold text-emerald-900 text-sm">المتبقي (الباقي للعميل):</span>
+<span id="change-amount" class="text-xl font-black text-emerald-600">0.00 درهم</span>
+</div>
+<div class="flex gap-3">
+<button onclick="closeCashModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 rounded-2xl font-bold transition">إلغاء</button>
+<button onclick="completeOrder()" id="confirm-pay-btn" disabled class="flex-1 acai-bg-primary opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition shadow-md">تأكيد الدفع</button>
+</div>
+</div>
+</div>
+<!-- Loyalty Card Modal -->
+<div id="loyalty-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-gradient-to-br from-[#581c40] to-[#7b2c59] text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+<div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+<div class="flex justify-between items-start mb-6 relative z-10">
+<div>
+<span class="text-xs uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">بطاقة ولاء العملاء</span>
+<h3 class="text-2xl font-black mt-2">Acai Bowls VIP</h3>
+</div>
+<button onclick="toggleLoyaltyModal()" class="text-white/80 hover:text-white text-xl font-bold">✕</button>
+</div>
+<div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/20 relative z-10">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm text-white/85">رصيد النقاط الحالي:</span>
+<span id="loyalty-card-points" class="text-2xl font-black text-amber-300">3 نقاط</span>
+</div>
+<p class="text-xs text-white/70">كل 10 طلبات تمنحك كوب أساي كبير مجاناً!</p>
+</div>
+<!-- Stamps Grid -->
+<div class="mb-6 relative z-10">
+<p class="text-xs font-semibold mb-3 text-white/80">أختام الولاء (اكتملت 3 من 10):</p>
+<div id="stamps-grid" class="grid grid-cols-5 gap-2">
+<!-- Stamps generated via JS -->
+</div>
+</div>
+<button onclick="toggleLoyaltyModal()" class="w-full bg-white text-[#581c40] py-3.5 rounded-2xl font-bold hover:bg-rose-50 transition relative z-10 shadow-sm">إغلاق البطاقة</button>
+</div>
+</div>
+<!-- Success Order & Receipt Modal -->
+<div id="success-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-rose-100">
+<div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
+<h3 class="text-xl font-bold acai-primary mb-1">تم إتمام الطلب بنجاح!</h3>
+<p class="text-sm text-slate-500 mb-4">تم تسجيل الدفع النقدي وإضافة ختم جديد لبطاقة الولاء.</p>
+<div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border border-rose-100 space-y-1">
+<!-- Receipt details generated -->
+</div>
+<button onclick="closeSuccessModal()" class="w-full acai-bg-primary text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">طلب جديد</button>
+</div>
+</div>
+<!-- JavaScript Application Logic -->
+<script>
+// Menu based on the provided images
+const products = [
+{ id: 1, name: 'أساي مقاس صغير', category: 'bowls', price: 3.00, image: '🥣', desc: 'كوب أساي طازج ومنعش - مقاس صغير' },
+{ id: 2, name: 'أساي مقاس كبير', category: 'bowls', price: 5.00, image: '🍨', desc: 'كوب أساي مشبع ومثالي - مقاس كبير' },
+{ id: 3, name: 'موز إضافي', category: 'toppings', price: 1.00, image: '🍌', desc: 'شرائح الموز الطازجة' },
+{ id: 4, name: 'فراولة إضافية', category: 'toppings', price: 1.00, image: '🍓', desc: 'قطع الفراولة الطازجة' },
+{ id: 5, name: 'توت أزرق إضافي', category: 'toppings', price: 1.00, image: '🫐', desc: 'حبات التوت الأزرق الطبيعي' },
+{ id: 6, name: 'جرانولا إضافية', category: 'toppings', price: 1.00, image: '🌾', desc: 'حبوب الجرانولا المقرمشة' },
+{ id: 7, name: 'جوز هند إضافي', category: 'toppings', price: 1.00, image: '🥥', desc: 'رقائق جوز الهند الطازجة' }
+];
+let cart = [];
+let currentCategory = 'all';
+let loyaltyPoints = 3;
+window.onload = function() {
+renderProducts();
+renderStamps();
+};
+function renderProducts() {
+const grid = document.getElementById('products-grid');
+grid.innerHTML = '';
+const filtered = currentCategory === 'all'
+? products
+: products.filter(p => p.category === currentCategory);
+filtered.forEach(product => {
+const card = document.createElement('div');
+card.className = 'bg-white border border-rose-100 rounded-3xl p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer group';
+card.onclick = () => addToCart(product.id);
+card.innerHTML = ⁠<div> <div class="w-full h-32 bg-rose-50/50 rounded-2xl flex items-center justify-center text-5xl mb-3 group-hover:scale-105 transition transform border border-rose-100/50"> ${product.image} </div> <h3 class="font-bold acai-primary text-sm mb-1">${product.name}</h3> <p class="text-xs text-slate-400 mb-2">${product.desc}</p> </div> <div class="flex justify-between items-center mt-2 pt-3 border-t border-rose-50"> <span class="font-black acai-primary text-base">${product.price.toFixed(2)} درهم</span> <button class="bg-rose-100 text-[#581c40] text-xs px-3.5 py-2 rounded-xl font-bold group-hover:bg-[#581c40] group-hover:text-white transition shadow-sm">إضافة</button> </div>⁠;
+grid.appendChild(card);
+});
+}
+function filterCategory(category) {
+currentCategory = category;
+document.querySelectorAll('.category-btn').forEach(btn => {
+btn.classList.remove('bg-[#581c40]', 'text-white', 'shadow-sm');
+btn.classList.add('bg-white', 'text-slate-600', 'border', 'border-rose-100');
+});
+event.target.classList.remove('bg-white', 'text-slate-600', 'border', 'border-rose-100');
+event.target.classList.add('bg-[#581c40]', 'text-white', 'shadow-sm');
+renderProducts();
+}
+function addToCart(productId) {
+const product = products.find(p => p.id === productId);
+const existing = cart.find(item => item.id === productId);
+if (existing) {
+existing.quantity += 1;
+} else {
+cart.push({ ...product, quantity: 1 });
+}
+updateCartUI();
+}
+function updateQuantity(productId, delta) {
+const item = cart.find(i => i.id === productId);
+if (item) {
+item.quantity += delta;
+if (item.quantity <= 0) {
+cart = cart.filter(i => i.id !== productId);
+}
+}
+updateCartUI();
+}
+function updateCartUI() {
+const container = document.getElementById('cart-items');
+const itemCountEl = document.getElementById('item-count');
+const subtotalEl = document.getElementById('subtotal');
+const totalEl = document.getElementById('total');
+const checkoutBtn = document.getElementById('checkout-btn');
+container.innerHTML = '';
+if (cart.length === 0) {
+container.innerHTML = ⁠<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي المفضل لديك!</p>⁠;
+itemCountEl.innerText = ⁠0 عناصر⁠;
+subtotalEl.innerText = ⁠0.00 درهم⁠;
+totalEl.innerText = ⁠0.00 درهم⁠;
+checkoutBtn.disabled = true;
+checkoutBtn.className = "mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm";
+return;
+}
+let totalItems = 0;
+let subtotal = 0;
+cart.forEach(item => {
+totalItems += item.quantity;
+subtotal += item.price * item.quantity;
+const row = document.createElement('div');
+row.className = 'py-2.5 flex justify-between items-center';
+row.innerHTML = ⁠<div class="flex-grow"> <h4 class="text-xs font-bold acai-primary">${item.name}</h4> <span class="text-xs text-rose-500 font-bold">${(item.price * item.quantity).toFixed(2)} درهم</span> </div> <div class="flex items-center gap-2 bg-rose-50 rounded-xl p-1 border border-rose-100"> <button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">-</button> <span class="text-xs font-bold w-4 text-center acai-primary">${item.quantity}</span> <button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">+</button> </div>⁠;
+container.appendChild(row);
+});
+itemCountEl.innerText = ⁠${totalItems} عناصر⁠;
+subtotalEl.innerText = ⁠${subtotal.toFixed(2)} درهم⁠;
+totalEl.innerText = ⁠${subtotal.toFixed(2)} درهم⁠;
+checkoutBtn.disabled = false;
+checkoutBtn.className = "mt-6 w-full acai-bg-primary hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition shadow-md cursor-pointer";
+}
+function openCashModal() {
+const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+document.getElementById('modal-total').innerText = ⁠${total.toFixed(2)} درهم⁠;
+document.getElementById('cash-given').value = '';
+document.getElementById('change-amount').innerText = ⁠0.00 درهم⁠;
+document.getElementById('confirm-pay-btn').disabled = true;
+document.getElementById('confirm-pay-btn').className = "flex-1 acai-bg-primary opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
+document.getElementById('cash-modal').classList.remove('hidden');
+}
+function closeCashModal() {
+document.getElementById('cash-modal').classList.add('hidden');
+}
+function calculateChange() {
+const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
+const change = cashGiven - total;
+const changeEl = document.getElementById('change-amount');
+const confirmBtn = document.getElementById('confirm-pay-btn');
+if (cashGiven >= total) {
+changeEl.innerText = ⁠${change.toFixed(2)} درهم⁠;
+changeEl.className = "text-xl font-black text-emerald-600";
+confirmBtn.disabled = false;
+confirmBtn.className = "flex-1 acai-bg-primary hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition cursor-pointer shadow-md";
+} else {
+changeEl.innerText = ⁠المبلغ المدفوع غير كافٍ⁠;
+changeEl.className = "text-xs font-bold text-rose-500";
+confirmBtn.disabled = true;
+confirmBtn.className = "flex-1 acai-bg-primary opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
+}
+}
+function completeOrder() {
+const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
+const change = cashGiven - total;
+closeCashModal();
+// Build receipt details
+let receiptHtml = ⁠<div class="font-bold text-slate-700 border-b border-rose-100 pb-1 mb-1">إيصال الدفع النقدي - Acai Bowls</div>⁠;
+cart.forEach(item => {
+receiptHtml += ⁠<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>⁠;
+});
+receiptHtml += ⁠<div class="border-t border-rose-100 pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>⁠;
+receiptHtml += ⁠<div class="flex justify-between text-slate-500"><span>المسدد كاش:</span><span>${cashGiven.toFixed(2)} د.إ</span></div>⁠;
+receiptHtml += ⁠<div class="flex justify-between text-emerald-600 font-bold"><span>الباقي للعميل:</span><span>${change.toFixed(2)} د.إ</span></div>⁠;
+document.getElementById('receipt-details').innerHTML = receiptHtml;
+// Update loyalty points
+loyaltyPoints = Math.min(10, loyaltyPoints + 1);
+document.getElementById('loyalty-points').innerText = loyaltyPoints;
+document.getElementById('loyalty-card-points').innerText = ⁠${loyaltyPoints} نقاط⁠;
+renderStamps();
+cart = [];
+updateCartUI();
+document.getElementById('success-modal').classList.remove('hidden');
+}
+function closeSuccessModal() {
+document.getElementById('success-modal').classList.add('hidden');
+}
+function toggleLoyaltyModal() {
+document.getElementById('loyalty-modal').classList.toggle('hidden');
+}
+function renderStamps() {
+const grid = document.getElementById('stamps-grid');
+grid.innerHTML = '';
+for (let i = 1; i <= 10; i++) {
+const stamp = document.createElement('div');
+const isStamped = i <= loyaltyPoints;
+stamp.className = ⁠h-11 rounded-2xl flex items-center justify-center font-bold text-xs border ${ isStamped  ? 'bg-amber-400 text-indigo-950 border-amber-300 shadow-sm'  : 'bg-white/5 border-white/10 text-white/40' }⁠;
+stamp.innerHTML = isStamped ? '🥣' : i;
+grid.appendChild(stamp);
+}
+}
+</script>
+</body>
+</html>
