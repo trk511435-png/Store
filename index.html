@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acai Bowls - نظام الطلب والدفع النقدي</title>
-<!-- Tailwind CSS CDN -->
+<title>Acai Bowls - نظام الطلب والكاشير</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -14,7 +13,6 @@ background-color: #fdfbf7;
 }
 .acai-primary { color: #581c40; }
 .acai-bg-primary { background-color: #581c40; }
-.acai-border { border-color: #e5b2c3; }
 </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
@@ -27,7 +25,7 @@ background-color: #fdfbf7;
 </div>
 <div>
 <h1 class="text-xl font-black acai-primary tracking-wide">Acai Bowls</h1>
-<p class="text-xs text-rose-400 font-semibold">منعش، طبيعي، وصحي</p>
+<p class="text-xs text-rose-400 font-semibold">نظام الطلب والدفع النقدي</p>
 </div>
 </div>
 <div>
@@ -43,13 +41,13 @@ background-color: #fdfbf7;
 <div class="lg:col-span-2 space-y-6">
 <!-- Category Tabs -->
 <div class="flex gap-2 overflow-x-auto pb-2">
-<button onclick="filterCategory('all')" class="category-btn active px-5 py-2.5 rounded-2xl bg-[#581c40] text-white text-sm font-bold whitespace-nowrap shadow-sm transition">جميع الأحجام</button>
-<button onclick="filterCategory('bowls')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">أكواب الأساي الأساسية</button>
-<button onclick="filterCategory('toppings')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">الإضافات الخاصة (+1 درهم)</button>
+<button onclick="filterCategory('all')" class="category-btn active px-5 py-2.5 rounded-2xl bg-[#581c40] text-white text-sm font-bold whitespace-nowrap shadow-sm transition">جميع المنتجات</button>
+<button onclick="filterCategory('bowls')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">أكواب الأساي</button>
+<button onclick="filterCategory('toppings')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">الإضافات الأخرى (+1 درهم)</button>
 </div>
 <!-- Products Grid -->
 <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-<!-- Products dynamically inserted via JS -->
+<!-- Dynamically loaded -->
 </div>
 </div>
 <!-- Order Summary & Checkout Section (1 Column) -->
@@ -87,7 +85,7 @@ background-color: #fdfbf7;
 <div id="cash-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100">
 <h3 class="text-xl font-bold acai-primary mb-2">الدفع النقدي (كاش) 💵</h3>
-<p class="text-sm text-slate-500 mb-4">أدخل المبلغ المستلم من العميل لحساب الصرف بدقة.</p>
+<p class="text-sm text-slate-500 mb-4">أدخل المبلغ المستلم من العميل لحساب الباقي بدقة.</p>
 <div class="bg-rose-50/60 p-4 rounded-2xl mb-4 space-y-2 border border-rose-100">
 <div class="flex justify-between text-sm">
 <span class="text-slate-600 font-semibold">المبلغ المطلوب:</span>
@@ -99,7 +97,7 @@ background-color: #fdfbf7;
 <input type="number" id="cash-given" oninput="calculateChange()" class="w-full border border-rose-200 rounded-2xl px-4 py-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-[#581c40]" placeholder="0.00">
 </div>
 <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl mb-6 flex justify-between items-center">
-<span class="font-bold text-emerald-900 text-sm">المتبقي (الباقي للعميل):</span>
+<span class="font-bold text-emerald-900 text-sm">الباقي للعميل:</span>
 <span id="change-amount" class="text-xl font-black text-emerald-600">0.00 درهم</span>
 </div>
 <div class="flex gap-3">
@@ -111,8 +109,6 @@ background-color: #fdfbf7;
 <!-- Loyalty Card Modal -->
 <div id="loyalty-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-gradient-to-br from-[#581c40] to-[#7b2c59] text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
-<div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-<div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
 <div class="flex justify-between items-start mb-6 relative z-10">
 <div>
 <span class="text-xs uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">بطاقة ولاء العملاء</span>
@@ -120,19 +116,16 @@ background-color: #fdfbf7;
 </div>
 <button onclick="toggleLoyaltyModal()" class="text-white/80 hover:text-white text-xl font-bold">✕</button>
 </div>
-<div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/20 relative z-10">
+<div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/25 relative z-10">
 <div class="flex justify-between items-center mb-1">
 <span class="text-sm text-white/85">رصيد النقاط الحالي:</span>
 <span id="loyalty-card-points" class="text-2xl font-black text-amber-300">3 نقاط</span>
 </div>
 <p class="text-xs text-white/70">كل 10 طلبات تمنحك كوب أساي كبير مجاناً!</p>
 </div>
-<!-- Stamps Grid -->
 <div class="mb-6 relative z-10">
 <p class="text-xs font-semibold mb-3 text-white/80">أختام الولاء (اكتملت 3 من 10):</p>
-<div id="stamps-grid" class="grid grid-cols-5 gap-2">
-<!-- Stamps generated via JS -->
-</div>
+<div id="stamps-grid" class="grid grid-cols-5 gap-2"></div>
 </div>
 <button onclick="toggleLoyaltyModal()" class="w-full bg-white text-[#581c40] py-3.5 rounded-2xl font-bold hover:bg-rose-50 transition relative z-10 shadow-sm">إغلاق البطاقة</button>
 </div>
@@ -143,23 +136,20 @@ background-color: #fdfbf7;
 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
 <h3 class="text-xl font-bold acai-primary mb-1">تم إتمام الطلب بنجاح!</h3>
 <p class="text-sm text-slate-500 mb-4">تم تسجيل الدفع النقدي وإضافة ختم جديد لبطاقة الولاء.</p>
-<div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border border-rose-100 space-y-1">
-<!-- Receipt details generated -->
-</div>
+<div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border border-rose-100 space-y-1"></div>
 <button onclick="closeSuccessModal()" class="w-full acai-bg-primary text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">طلب جديد</button>
 </div>
 </div>
 <!-- JavaScript Application Logic -->
 <script>
-// Menu based on the provided images
 const products = [
-{ id: 1, name: 'أساي مقاس صغير', category: 'bowls', price: 3.00, image: '🥣', desc: 'كوب أساي طازج ومنعش - مقاس صغير' },
-{ id: 2, name: 'أساي مقاس كبير', category: 'bowls', price: 5.00, image: '🍨', desc: 'كوب أساي مشبع ومثالي - مقاس كبير' },
-{ id: 3, name: 'موز إضافي', category: 'toppings', price: 1.00, image: '🍌', desc: 'شرائح الموز الطازجة' },
-{ id: 4, name: 'فراولة إضافية', category: 'toppings', price: 1.00, image: '🍓', desc: 'قطع الفراولة الطازجة' },
-{ id: 5, name: 'توت أزرق إضافي', category: 'toppings', price: 1.00, image: '🫐', desc: 'حبات التوت الأزرق الطبيعي' },
-{ id: 6, name: 'جرانولا إضافية', category: 'toppings', price: 1.00, image: '🌾', desc: 'حبوب الجرانولا المقرمشة' },
-{ id: 7, name: 'جوز هند إضافي', category: 'toppings', price: 1.00, image: '🥥', desc: 'رقائق جوز الهند الطازجة' }
+{ id: 1, name: 'أساي مقاس صغير', category: 'bowls', price: 3.00, image: '🥣', desc: 'كوب أساي طازج - مقاس صغير' },
+{ id: 2, name: 'أساي مقاس كبير', category: 'bowls', price: 5.00, image: '🍨', desc: 'كوب أساي مشبع - مقاس كبير' },
+{ id: 3, name: 'موز', category: 'toppings', price: 1.00, image: '🍌', desc: 'إضافة شرائح موز طازجة' },
+{ id: 4, name: 'فراولة', category: 'toppings', price: 1.00, image: '🍓', desc: 'إضافة قطع فراولة طازجة' },
+{ id: 5, name: 'توت أزرق', category: 'toppings', price: 1.00, image: '🫐', desc: 'إضافة توت أزرق طبيعي' },
+{ id: 6, name: 'جرانولا', category: 'toppings', price: 1.00, image: '🌾', desc: 'إضافة جرانولا مقرمشة' },
+{ id: 7, name: 'جوز هند', category: 'toppings', price: 1.00, image: '🥥', desc: 'إضافة جوز هند طازج' }
 ];
 let cart = [];
 let currentCategory = 'all';
@@ -171,9 +161,7 @@ renderStamps();
 function renderProducts() {
 const grid = document.getElementById('products-grid');
 grid.innerHTML = '';
-const filtered = currentCategory === 'all'
-? products
-: products.filter(p => p.category === currentCategory);
+const filtered = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
 filtered.forEach(product => {
 const card = document.createElement('div');
 card.className = 'bg-white border border-rose-100 rounded-3xl p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer group';
@@ -279,8 +267,7 @@ const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
 const change = cashGiven - total;
 closeCashModal();
-// Build receipt details
-let receiptHtml = ⁠<div class="font-bold text-slate-700 border-b border-rose-100 pb-1 mb-1">إيصال الدفع النقدي - Acai Bowls</div>⁠;
+let receiptHtml = ⁠<div class="font-bold text-slate-700 border-b border-rose-100 pb-1 mb-1">إيصال دفع نقدي - Acai Bowls</div>⁠;
 cart.forEach(item => {
 receiptHtml += ⁠<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>⁠;
 });
@@ -288,7 +275,6 @@ receiptHtml += ⁠<div class="border-t border-rose-100 pt-1 mt-1 font-bold flex 
 receiptHtml += ⁠<div class="flex justify-between text-slate-500"><span>المسدد كاش:</span><span>${cashGiven.toFixed(2)} د.إ</span></div>⁠;
 receiptHtml += ⁠<div class="flex justify-between text-emerald-600 font-bold"><span>الباقي للعميل:</span><span>${change.toFixed(2)} د.إ</span></div>⁠;
 document.getElementById('receipt-details').innerHTML = receiptHtml;
-// Update loyalty points
 loyaltyPoints = Math.min(10, loyaltyPoints + 1);
 document.getElementById('loyalty-points').innerText = loyaltyPoints;
 document.getElementById('loyalty-card-points').innerText = ⁠${loyaltyPoints} نقاط⁠;
@@ -309,7 +295,7 @@ grid.innerHTML = '';
 for (let i = 1; i <= 10; i++) {
 const stamp = document.createElement('div');
 const isStamped = i <= loyaltyPoints;
-stamp.className = ⁠h-11 rounded-2xl flex items-center justify-center font-bold text-xs border ${ isStamped  ? 'bg-amber-400 text-indigo-950 border-amber-300 shadow-sm'  : 'bg-white/5 border-white/10 text-white/40' }⁠;
+stamp.className = ⁠h-11 rounded-2xl flex items-center justify-center font-bold text-xs border ${ isStamped ? 'bg-amber-400 text-indigo-950 border-amber-300 shadow-sm' : 'bg-white/5 border-white/10 text-white/40' }⁠;
 stamp.innerHTML = isStamped ? '🥣' : i;
 grid.appendChild(stamp);
 }
