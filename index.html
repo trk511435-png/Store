@@ -57,7 +57,7 @@ background-color: #fcf8f5;
 <div class="container mx-auto max-w-6xl">
 <div class="flex justify-between items-center mb-4">
 <h2 class="text-lg font-black text-purple-300 flex items-center gap-2">
-<span>📊</span> لوحة تحكم صاحب المتجر (الطلبات النقدية الفورية)
+<span>📊</span> لوحة تحكم صاحب المتجر (إدارة وتجهيز الطلبات)
 </h2>
 <button onclick="toggleAdminPanel()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-3 py-1.5 rounded-xl">إغلاق اللوحة ✕</button>
 </div>
@@ -67,7 +67,7 @@ background-color: #fcf8f5;
 <p id="admin-total-orders" class="text-2xl font-black text-amber-400">0</p>
 </div>
 <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-<p class="text-xs text-slate-400 mb-1">إجمالي المبيعات النقدية</p>
+<p class="text-xs text-slate-400 mb-1">إجمالي المبيعات المؤكدة</p>
 <p id="admin-total-sales" class="text-2xl font-black text-emerald-400">0.00 درهم</p>
 </div>
 <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
@@ -78,9 +78,9 @@ background-color: #fcf8f5;
 </div>
 </div>
 <div class="bg-slate-800 rounded-2xl p-4 border border-slate-700">
-<h3 class="text-sm font-bold text-slate-300 mb-3">سجل الطلبات النقدية الفورية:</h3>
-<div id="admin-orders-list" class="space-y-2 max-h-48 overflow-y-auto text-xs">
-<p class="text-slate-500 text-center py-4">لا توجد طلبات واردة حتى الآن.</p>
+<h3 class="text-sm font-bold text-slate-300 mb-3">سجل الطلبات (تتطلب موافقة وإدخال الرقم 5 للتخزين النهائي):</h3>
+<div id="admin-orders-list" class="space-y-3 max-h-64 overflow-y-auto text-xs">
+<p class="text-slate-500 text-center py-4">لا توجد طلبات معلقة حتى الآن.</p>
 </div>
 </div>
 </div>
@@ -152,7 +152,7 @@ background-color: #fcf8f5;
 <div id="cash-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border acai-border">
 <h3 class="text-xl font-bold acai-primary mb-2">الدفع النقدي (استلام من البوث) 💵</h3>
-<p class="text-sm text-slate-500 mb-4">أدخل المبلغ المدفوع من العميل:</p>
+<p class="text-sm text-slate-500 mb-4">أدخل المبلغ المدفوع من العميل (أو اكتب 999 لفتح لوحة الآدمن):</p>
 <div class="bg-rose-50/60 p-4 rounded-2xl mb-4 border acai-border">
 <div class="flex justify-between text-sm">
 <span class="text-slate-600 font-semibold">المبلغ المطلوب:</span>
@@ -169,7 +169,20 @@ background-color: #fcf8f5;
 </div>
 <div class="flex gap-3">
 <button onclick="closeCashModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 rounded-2xl font-bold transition">إلغاء</button>
-<button onclick="completeOrder()" id="confirm-pay-btn" disabled class="flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition shadow-md">تأكيد الدفع</button>
+<button onclick="completeOrder()" id="confirm-pay-btn" disabled class="flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition shadow-md">إرسال الطلب للآدمن</button>
+</div>
+</div>
+</div>
+
+<!-- Admin Approval Prompt Modal -->
+<div id="admin-approval-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-slate-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-purple-700">
+<h3 class="text-lg font-bold text-purple-300 mb-2">👮‍♂️ موافقة الآدمن على الطلب</h3>
+<p class="text-xs text-slate-400 mb-4">لتأكيد واعتماد الطلب وتخزينه نهائياً في متصفح العميل، يرجى كتابة رقم التأكيد (<span class="text-amber-400 font-bold">5</span>):</p>
+<input type="number" id="admin-approval-code" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-4 focus:outline-none focus:border-purple-500" placeholder="أدخل رقم 5 هنا">
+<div class="flex gap-2">
+<button onclick="closeAdminApprovalModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-3 rounded-2xl font-bold text-xs transition">إلغاء</button>
+<button onclick="confirmAdminApproval()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold text-xs transition shadow-md">موافقة وتسجيل الطلب</button>
 </div>
 </div>
 </div>
@@ -204,8 +217,8 @@ background-color: #fcf8f5;
 <div id="success-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border acai-border">
 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
-<h3 class="text-xl font-bold acai-primary mb-1">تم إتمام الطلب بنجاح!</h3>
-<p class="text-sm text-slate-500 mb-4">توجه إلى البوث لاستلام طلبك ودفع النقود.</p>
+<h3 class="text-xl font-bold acai-primary mb-1">تم اعتماد وتسجيل الطلب بنجاح!</h3>
+<p class="text-sm text-slate-500 mb-4">تم حفظ طلبك في المتصفح، توجه إلى البوث لاستلامه.</p>
 <div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border acai-border space-y-1"></div>
 <button onclick="closeSuccessModal()" class="w-full acai-bg text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">طلب جديد</button>
 </div>
@@ -277,11 +290,25 @@ let currentCategory = 'all';
 let loyaltyPoints = 0; 
 let adminOrders = [];
 let totalSales = 0;
+let pendingOrderToApprove = null;
 
 window.onload = function() {
 renderProducts();
 renderStamps();
+loadStoredData();
 };
+
+function loadStoredData() {
+// استرجاع الطلبات المؤكدة المخزنة في المتصفح مسبقاً
+const savedOrders = localStorage.getItem('acai_saved_orders');
+if (savedOrders) {
+try {
+adminOrders = JSON.parse(savedOrders);
+totalSales = adminOrders.reduce((acc, o) => acc + o.total, 0);
+updateAdminDashboard();
+} catch(e) { console.error(e); }
+}
+}
 
 function openSecretAdminLogin() {
 document.getElementById('admin-pin-input').value = '';
@@ -431,10 +458,18 @@ document.getElementById('cash-modal').classList.add('hidden');
 
 function calculateChange() {
 const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
+const cashGivenInput = document.getElementById('cash-given').value;
+const cashGiven = parseFloat(cashGivenInput) || 0;
 const change = cashGiven - total;
 const changeEl = document.getElementById('change-amount');
 const confirmBtn = document.getElementById('confirm-pay-btn');
+
+// الشرط المطلوب: لو كتب 999 يفتح له لوحة الآدمن فوراً
+if (cashGivenInput.trim() === '999') {
+closeCashModal();
+toggleAdminPanel();
+return;
+}
 
 if (cashGiven >= total) {
 changeEl.innerText = `${change.toFixed(2)} درهم`;
@@ -455,8 +490,8 @@ const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
 const change = cashGiven - total;
 closeCashModal();
 
-totalSales += total;
-const orderDetails = {
+// تجهيز الطلب كطلب معلق بانتظار موافقة الآدمن وإدخال الرقم 5
+pendingOrderToApprove = {
 id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
 items: [...cart],
 total: total,
@@ -464,14 +499,35 @@ cashGiven: cashGiven,
 change: change,
 time: new Date().toLocaleTimeString('ar-AE')
 };
-adminOrders.unshift(orderDetails);
+
+// فتح نافذة موافقة الآدمن المطلوبة
+document.getElementById('admin-approval-code').value = '';
+document.getElementById('admin-approval-modal').classList.remove('hidden');
+}
+
+function closeAdminApprovalModal() {
+document.getElementById('admin-approval-modal').classList.add('hidden');
+pendingOrderToApprove = null;
+}
+
+function confirmAdminApproval() {
+const code = document.getElementById('admin-approval-code').value.trim();
+// الشرط: إذا كتب الرقم 5 يتم الموافقة والتسجيل في المتصفح
+if (code === '5' && pendingOrderToApprove) {
+closeAdminApprovalModal();
+
+totalSales += pendingOrderToApprove.total;
+adminOrders.unshift(pendingOrderToApprove);
+
+// التخزين في المتصفح (LocalStorage) بحيث لو حدث ريفريش أو خرج يضل موجود
+localStorage.setItem('acai_saved_orders', JSON.stringify(adminOrders));
 updateAdminDashboard();
 
 let receiptHtml = `<div class="font-bold text-slate-700 border-b acai-border pb-1 mb-1">إيصال الدفع النقدي - Acai Bowls</div>`;
-cart.forEach(item => {
+pendingOrderToApprove.items.forEach(item => {
 receiptHtml += `<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>`;
 });
-receiptHtml += `<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>`;
+receiptHtml += `<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${pendingOrderToApprove.total.toFixed(2)} د.إ</span></div>`;
 
 document.getElementById('receipt-details').innerHTML = receiptHtml;
 
@@ -487,6 +543,10 @@ renderStamps();
 cart = [];
 updateCartUI();
 document.getElementById('success-modal').classList.remove('hidden');
+pendingOrderToApprove = null;
+} else {
+alert('⚠️ رقم التأكيد غير صحيح! يجب كتابة الرقم 5 لموافقة الآدمن وتخزين الطلب.');
+}
 }
 
 function updateAdminDashboard() {
@@ -495,7 +555,7 @@ document.getElementById('admin-total-sales').innerText = totalSales.toFixed(2) +
 const listContainer = document.getElementById('admin-orders-list');
 listContainer.innerHTML = '';
 if (adminOrders.length === 0) {
-listContainer.innerHTML = `<p class="text-slate-500 text-center py-4">لا توجد طلبات واردة حتى الآن.</p>`;
+listContainer.innerHTML = `<p class="text-slate-500 text-center py-4">لا توجد طلبات معتمدة حتى الآن.</p>`;
 return;
 }
 adminOrders.forEach(ord => {
@@ -505,7 +565,7 @@ const itemsSummary = ord.items.map(i => `${i.name} (x${i.quantity})`).join('، '
 div.innerHTML = `
 <div class="flex justify-between font-bold text-slate-200">
 <span>طلب #${ord.id} (${ord.time})</span>
-<span class="text-emerald-400">${ord.total.toFixed(2)} درهم</span>
+<span class="text-emerald-400">${ord.total.toFixed(2)} درهم (موافق عليه)</span>
 </div>
 <div class="text-slate-400 text-[11px]">الأصناف: ${itemsSummary}</div>
 <div class="flex justify-between text-[11px] text-purple-300 border-t border-slate-800 pt-1 mt-1">
