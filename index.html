@@ -21,7 +21,8 @@ background-color: #fcf8f5;
 <header class="bg-white border-b acai-border shadow-sm sticky top-0 z-40">
 <div class="container mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center space-x-3 space-x-reverse">
-<div class="w-12 h-12 rounded-full acai-bg flex items-center justify-center text-white text-2xl shadow-md overflow-hidden border-2 border-rose-200">
+<!-- زر سري مخفي للوصول للآدمن عند الضغط المطول أو النقر المزدوج على شعار المتجر -->
+<div ondblclick="openSecretAdminLogin()" class="w-12 h-12 rounded-full acai-bg flex items-center justify-center text-white text-2xl shadow-md overflow-hidden border-2 border-rose-200 cursor-pointer title='انقر مرتين للتحكم الإداري'" title="اضغط مرتين للوحة التحكم">
 🍇
 </div>
 <div>
@@ -30,22 +31,33 @@ background-color: #fcf8f5;
 </div>
 </div>
 <div class="flex items-center gap-2">
-<button onclick="toggleAdminPanel()" class="bg-purple-100 hover:bg-purple-200 text-purple-900 px-3.5 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-1.5 shadow-sm border border-purple-200">
-<span>⚙️</span> لوحة الكاشير (المالك)
-</button>
 <button onclick="toggleLoyaltyModal()" class="bg-rose-50 hover:bg-rose-100 text-[#581c40] px-4 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-2 shadow-sm border acai-border">
-<span>🎟️</span> الولاء (<span id="loyalty-points">3</span>)
+<span>🎟️</span> بطاقة الولاء الماسية (<span id="loyalty-points">0</span>/3)
 </button>
 </div>
 </div>
 </header>
 
-<!-- Admin / Cashier Dashboard Section (Hidden by default, toggled by owner) -->
+<!-- Hidden Admin Login Modal (مشفر ومحمي بكلمة مرور) -->
+<div id="admin-login-modal" class="fixed inset-0 bg-[#581c40]/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-slate-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-purple-900">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-base font-bold text-purple-300">🔐 بوابة المالك المشفرة</h3>
+<button onclick="closeAdminLoginModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+</div>
+<p class="text-xs text-slate-400 mb-4">أدخل الرمز السري الخاص بالمدير للوصول للوحة المبيعات:</p>
+<input type="password" id="admin-pin-input" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-3 focus:outline-none focus:border-purple-500" placeholder="••••">
+<p id="admin-login-error" class="text-xs text-rose-400 mb-3 hidden text-center">الرمز السري غير صحيح!</p>
+<button onclick="verifyAdminPin()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold transition">دخول لوحة التحكم</button>
+</div>
+</div>
+
+<!-- Admin / Cashier Dashboard Section (Hidden by default, protected) -->
 <div id="admin-panel" class="hidden bg-slate-900 text-white border-b border-purple-900 py-6 px-4 shadow-inner">
 <div class="container mx-auto max-w-6xl">
 <div class="flex justify-between items-center mb-4">
 <h2 class="text-lg font-black text-purple-300 flex items-center gap-2">
-<span>📊</span> لوحة تحكم صاحب المتجر (الكاشير والطلبات النقدية)
+<span>📊</span> لوحة تحكم صاحب المتجر (الطلبات النقدية الفورية)
 </h2>
 <button onclick="toggleAdminPanel()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-3 py-1.5 rounded-xl">إغلاق اللوحة ✕</button>
 </div>
@@ -59,9 +71,9 @@ background-color: #fcf8f5;
 <p id="admin-total-sales" class="text-2xl font-black text-emerald-400">0.00 درهم</p>
 </div>
 <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-<p class="text-xs text-slate-400 mb-1">الحالة التشغيلية للبوث</p>
+<p class="text-xs text-slate-400 mb-1">حالة النظام الآمني</p>
 <p class="text-sm font-bold text-emerald-400 flex items-center gap-1 mt-1">
-<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> مستعد لاستقبال العملاء
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> مشفر ومؤمن بالكامل
 </p>
 </div>
 </div>
@@ -83,8 +95,8 @@ background-color: #fcf8f5;
 <h2 class="text-base font-bold acai-primary mb-3 flex items-center justify-center gap-2">
 <span>⭐</span> قائمة المنيو الرسمية المعتمدة
 </h2>
-<div class="w-full max-h-96 bg-rose-50 rounded-2xl overflow-hidden border border-rose-100 inline-block">
-<img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&auto=format&fit=crop&q=60" alt="Acai Official Menu" class="w-full h-full object-contain max-h-[400px]">
+<div class="w-full max-h-96 bg-rose-50 rounded-2xl overflow-hidden border border-rose-100 inline-block p-2">
+<img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&auto=format&fit=crop&q=80" alt="Acai Official Menu" class="w-full h-full object-cover max-h-[350px] rounded-xl">
 </div>
 </div>
 
@@ -151,9 +163,8 @@ background-color: #fcf8f5;
 <label class="block text-xs font-bold text-slate-700 mb-1">المبلغ المدفوع من العميل (درهم):</label>
 <input type="number" id="cash-given" oninput="calculateChange()" class="w-full border border-rose-200 rounded-2xl px-4 py-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-[#581c40]" placeholder="0.00">
 </div>
-<!-- تم تخصيص خانة المتبقي لتظهر حصرياً عبر شاشة الإدارة / الكاشير ولا تظهر للعميل العادي -->
 <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl mb-6 flex justify-between items-center">
-<span class="font-bold text-emerald-900 text-sm">المتبقي للعميل (خاص بالكاشير):</span>
+<span class="font-bold text-emerald-900 text-sm">المتبقي للعميل:</span>
 <span id="change-amount" class="text-xl font-black text-emerald-600">0.00 درهم</span>
 </div>
 <div class="flex gap-3">
@@ -163,28 +174,29 @@ background-color: #fcf8f5;
 </div>
 </div>
 
-<!-- Loyalty Card Modal -->
-<div id="loyalty-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-<div class="bg-gradient-to-br from-[#581c40] to-[#7b2c59] text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
+<!-- Loyalty Card Modal (نظام الـ 4 طلبات والمكافأة الكبيرة) -->
+<div id="loyalty-modal" class="fixed inset-0 bg-[#581c40]/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-gradient-to-br from-[#581c40] via-[#6b234f] to-[#3a1129] text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden border border-rose-300/30">
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
 <div class="flex justify-between items-start mb-6 relative z-10">
 <div>
-<span class="text-xs uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">بطاقة ولاء العملاء</span>
-<h3 class="text-2xl font-black mt-2">Acai Bowls VIP</h3>
+<span class="text-xs uppercase tracking-wider bg-amber-400 text-indigo-950 font-black px-3 py-1 rounded-full shadow-sm">برنامج الولاء VIP</span>
+<h3 class="text-2xl font-black mt-2">بطاقة مكافآت الأساي</h3>
 </div>
-<button onclick="toggleLoyaltyModal()" class="text-white/80 hover:text-white text-xl font-bold">✕</button>
+<button onclick="toggleLoyaltyModal()" class="text-white/80 hover:text-white text-xl font-bold bg-white/10 w-9 h-9 rounded-full flex items-center justify-center transition">✕</button>
 </div>
-<div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/25 relative z-10">
+<div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/20 relative z-10">
 <div class="flex justify-between items-center mb-1">
-<span class="text-sm text-white/85">رصيد النقاط الحالي:</span>
-<span id="loyalty-card-points" class="text-2xl font-black text-amber-300">3 نقاط</span>
+<span class="text-sm text-white/90 font-semibold">حالة الختم الحالي:</span>
+<span id="loyalty-card-points" class="text-2xl font-black text-amber-300">0 من 3</span>
 </div>
-<p class="text-xs text-white/70">كل 10 طلبات تمنحك كوب أساي كبير مجاناً!</p>
+<p class="text-xs text-amber-200/90 font-bold mt-1">✨ تطلب 3 مرات أي نوع، وفي المرة الرابعة يحصل العميل على حجم كبير مجاناً!</p>
 </div>
 <div class="mb-6 relative z-10">
-<p class="text-xs font-semibold mb-3 text-white/80">أختام الولاء (اكتملت 3 من 10):</p>
-<div id="stamps-grid" class="grid grid-cols-5 gap-2"></div>
+<p class="text-xs font-semibold mb-3 text-white/80">أختام الطلبات (الختم الرابع هو الجائزة الكبرى المجانية):</p>
+<div id="stamps-grid" class="grid grid-cols-4 gap-3"></div>
 </div>
-<button onclick="toggleLoyaltyModal()" class="w-full bg-white text-[#581c40] py-3.5 rounded-2xl font-bold hover:bg-rose-50 transition relative z-10 shadow-sm">إغلاق البطاقة</button>
+<button onclick="toggleLoyaltyModal()" class="w-full bg-white text-[#581c40] py-3.5 rounded-2xl font-bold hover:bg-rose-50 transition relative z-10 shadow-lg">إغلاق البطاقة</button>
 </div>
 </div>
 
@@ -207,7 +219,7 @@ id: 1,
 name: 'أساي مقاس صغير',
 category: 'bowls',
 price: 3.00,
-image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=500&auto=format&fit=crop&q=60',
+image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=500&auto=format&fit=crop&q=80',
 desc: 'كوب أساي طازج - مقاس صغير'
 },
 {
@@ -215,7 +227,7 @@ id: 2,
 name: 'أساي مقاس كبير',
 category: 'bowls',
 price: 5.00,
-image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60',
+image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80',
 desc: 'كوب أساي مشبع - مقاس كبير'
 },
 {
@@ -223,7 +235,7 @@ id: 3,
 name: 'موز',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500&auto=format&fit=crop&q=60',
+image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500&auto=format&fit=crop&q=80',
 desc: 'إضافة شرائح موز طازجة'
 },
 {
@@ -231,7 +243,7 @@ id: 4,
 name: 'فراولة',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=500&auto=format&fit=crop&q=60',
+image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=500&auto=format&fit=crop&q=80',
 desc: 'إضافة قطع فراولة طازجة'
 },
 {
@@ -239,7 +251,7 @@ id: 5,
 name: 'توت أزرق',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=60',
+image: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=80',
 desc: 'إضافة توت أزرق طبيعي'
 },
 {
@@ -247,7 +259,7 @@ id: 6,
 name: 'جرانولا',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1517093788736-2979207af2d1?w=500&auto=format&fit=crop&q=60',
+image: 'https://images.unsplash.com/photo-1517093788736-2979207af2d1?w=500&auto=format&fit=crop&q=80',
 desc: 'إضافة جرانولا مقرمشة'
 },
 {
@@ -255,14 +267,14 @@ id: 7,
 name: 'جوز هند',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1588611846571-70bf812d6f78?w=500&auto=format&fit=crop&q=60',
+image: 'https://images.unsplash.com/photo-1588611846571-70bf812d6f78?w=500&auto=format&fit=crop&q=80',
 desc: 'إضافة جوز هند طازج'
 }
 ];
 
 let cart = [];
 let currentCategory = 'all';
-let loyaltyPoints = 3;
+let loyaltyPoints = 0; // من 0 إلى 3 (والرابعة مكافأة)
 let adminOrders = [];
 let totalSales = 0;
 
@@ -271,9 +283,34 @@ renderProducts();
 renderStamps();
 };
 
+// وظائف التحكم السري بالآدمن عبر كلمة مرور (PIN)
+function openSecretAdminLogin() {
+document.getElementById('admin-pin-input').value = '';
+document.getElementById('admin-login-error').classList.add('hidden');
+document.getElementById('admin-login-modal').classList.remove('hidden');
+}
+
+function closeAdminLoginModal() {
+document.getElementById('admin-login-modal').classList.add('hidden');
+}
+
+function verifyAdminPin() {
+const pin = document.getElementById('admin-pin-input').value;
+// الرمز الافتراضي السري للآدمن هو 1234 (يمكن تغييره حسب الرغبة)
+if (pin === '1234') {
+closeAdminLoginModal();
+toggleAdminPanel();
+} else {
+document.getElementById('admin-login-error').classList.remove('hidden');
+}
+}
+
 function toggleAdminPanel() {
 const panel = document.getElementById('admin-panel');
 panel.classList.toggle('hidden');
+if (!panel.classList.contains('hidden')) {
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 }
 
 function renderProducts() {
@@ -420,7 +457,6 @@ const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
 const change = cashGiven - total;
 closeCashModal();
 
-// إضافة الطلب إلى لوحة تحكم صاحب المتجر (الكاشير)
 totalSales += total;
 const orderDetails = {
 id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
@@ -440,9 +476,15 @@ receiptHtml += `<div class="flex justify-between"><span>${item.name} (x${item.qu
 receiptHtml += `<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>`;
 
 document.getElementById('receipt-details').innerHTML = receiptHtml;
-loyaltyPoints = Math.min(10, loyaltyPoints + 1);
+
+// نظام الولاء: تطلب 3 مرات وفي الرابعة حجم كبير مجاناً
+loyaltyPoints++;
+if (loyaltyPoints > 3) {
+loyaltyPoints = 0;
+alert('🎉 مبروك! لقد أكملت 3 طلبات وحصلت على كوب أساي كبير مجاناً في هذا الطلب!');
+}
 document.getElementById('loyalty-points').innerText = loyaltyPoints;
-document.getElementById('loyalty-card-points').innerText = `${loyaltyPoints} نقاط`;
+document.getElementById('loyalty-card-points').innerText = `${loyaltyPoints} من 3`;
 renderStamps();
 
 cart = [];
@@ -489,11 +531,26 @@ document.getElementById('loyalty-modal').classList.toggle('hidden');
 function renderStamps() {
 const grid = document.getElementById('stamps-grid');
 grid.innerHTML = '';
-for (let i = 1; i <= 10; i++) {
+for (let i = 1; i <= 4; i++) {
 const stamp = document.createElement('div');
 const isStamped = i <= loyaltyPoints;
-stamp.className = `h-11 rounded-2xl flex items-center justify-center font-bold text-xs border ${ isStamped ? 'bg-amber-400 text-indigo-950 border-amber-300 shadow-sm' : 'bg-white/5 border-white/10 text-white/40' }`;
-stamp.innerHTML = isStamped ? '🥣' : i;
+const isReward = i === 4;
+
+stamp.className = `h-14 rounded-2xl flex flex-col items-center justify-center font-bold text-xs border transition-all ${
+isStamped 
+? 'bg-amber-400 text-indigo-950 border-amber-300 shadow-md scale-105' 
+: isReward 
+? 'bg-white/10 border-dashed border-amber-300/60 text-amber-300' 
+: 'bg-white/5 border-white/10 text-white/40'
+}`;
+
+if (isStamped) {
+stamp.innerHTML = `<span class="text-base">🥣</span><span class="text-[10px]">ختم ${i}</span>`;
+} else if (isReward) {
+stamp.innerHTML = `<span class="text-base">🎁</span><span class="text-[9px] font-bold">مجاناً كبير</span>`;
+} else {
+stamp.innerHTML = `<span class="text-sm">${i}</span>`;
+}
 grid.appendChild(stamp);
 }
 }
