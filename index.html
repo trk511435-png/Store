@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acai Bowls - نظام الطلب والكاشير</title>
+<title>Acai Bowls - نظام الطلب والكاشير السحابي</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- استيراد مكتبة السيرفر اللحظي Socket.io -->
+<script src="/socket.io/socket.io.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 body {
@@ -27,12 +29,15 @@ background-color: #fcf8f5;
 </div>
 <div>
 <h1 class="text-xl font-black acai-primary tracking-wide">Acai Bowls</h1>
-<p class="text-xs text-rose-500 font-bold">اطلب واستلم من البوث (دفع نقدي)</p>
+<p class="text-xs text-rose-500 font-bold">اطلب واستلم من البوث (متصل سحابياً)</p>
 </div>
 </div>
 <div class="flex items-center gap-2">
+<span id="connection-status" class="text-[10px] bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> جاري الاتصال...
+</span>
 <button onclick="toggleLoyaltyModal()" class="bg-rose-50 hover:bg-rose-100 text-[#581c40] px-4 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-2 shadow-sm border acai-border">
-<span>🎟️</span> بطاقة الولاء الماسية (<span id="loyalty-points">0</span>/3)
+<span>🎟️</span> بطاقة الولاء (<span id="loyalty-points">0</span>/3)
 </button>
 </div>
 </div>
@@ -45,7 +50,7 @@ background-color: #fcf8f5;
 <h3 class="text-base font-bold text-purple-300">🔐 بوابة المالك المشفرة</h3>
 <button onclick="closeAdminLoginModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
 </div>
-<p class="text-xs text-slate-400 mb-4">أ:</p>
+<p class="text-xs text-slate-400 mb-4">أدخل الرمز السري الخاص بالمدير للوصول للوحة المبيعات:</p>
 <input type="password" id="admin-pin-input" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-3 focus:outline-none focus:border-purple-500" placeholder="••••">
 <p id="admin-login-error" class="text-xs text-rose-400 mb-3 hidden text-center">الرمز السري غير صحيح! (الافتراضي: 1234)</p>
 <button onclick="verifyAdminPin()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold transition">دخول لوحة التحكم</button>
@@ -57,13 +62,13 @@ background-color: #fcf8f5;
 <div class="container mx-auto max-w-6xl">
 <div class="flex justify-between items-center mb-4">
 <h2 class="text-lg font-black text-purple-300 flex items-center gap-2">
-<span>📊</span> لوحة تحكم صاحب المتجر (إدارة وتجهيز الطلبات)
+<span>📊</span> لوحة تحكم صاحب المتجر (سحابية لحظية)
 </h2>
 <button onclick="toggleAdminPanel()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-3 py-1.5 rounded-xl">إغلاق اللوحة ✕</button>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-<p class="text-xs text-slate-400 mb-1">إجمالي الطلبات الواردة</p>
+<p class="text-xs text-slate-400 mb-1">إجمالي الطلبات المقبولة</p>
 <p id="admin-total-orders" class="text-2xl font-black text-amber-400">0</p>
 </div>
 <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
@@ -71,16 +76,16 @@ background-color: #fcf8f5;
 <p id="admin-total-sales" class="text-2xl font-black text-emerald-400">0.00 درهم</p>
 </div>
 <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-<p class="text-xs text-slate-400 mb-1">حالة النظام الآمني</p>
+<p class="text-xs text-slate-400 mb-1">حالة السيرفر السحابي</p>
 <p class="text-sm font-bold text-emerald-400 flex items-center gap-1 mt-1">
-<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> مشفر ومؤمن بالكامل
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> متصل بالسحاب (Real-time)
 </p>
 </div>
 </div>
 <div class="bg-slate-800 rounded-2xl p-4 border border-slate-700">
-<h3 class="text-sm font-bold text-slate-300 mb-3">سجل الطلبات (تتطلب موافقة وإدخال الرقم 5 للتخزين النهائي):</h3>
+<h3 class="text-sm font-bold text-slate-300 mb-3">سجل الطلبات الواردة من العملاء:</h3>
 <div id="admin-orders-list" class="space-y-3 max-h-64 overflow-y-auto text-xs">
-<p class="text-slate-500 text-center py-4">لا توجد طلبات معلقة حتى الآن.</p>
+<p class="text-slate-500 text-center py-4">لا توجد طلبات حتى الآن.</p>
 </div>
 </div>
 </div>
@@ -142,47 +147,21 @@ background-color: #fcf8f5;
 </div>
 
 <!-- Cash Payment Button -->
-<button onclick="openCashModal()" id="checkout-btn" disabled class="mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm">
-إتمام الطلب والدفع نقداً بالبوث 💵
+<button onclick="submitOrder()" id="checkout-btn" disabled class="mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm">
+إرسال الطلب (دفع نقدي بالبوث) 💵
 </button>
 </div>
 </main>
-
-<!-- Cash Payment Modal -->
-<div id="cash-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border acai-border">
-<h3 class="text-xl font-bold acai-primary mb-2">الدفع النقدي (استلام من البوث) 💵</h3>
-<p class="text-sm text-slate-500 mb-4">أدخل المبلغ المدفوع من العميل (أو اكتب 999 لفتح لوحة الآدمن):</p>
-<div class="bg-rose-50/60 p-4 rounded-2xl mb-4 border acai-border">
-<div class="flex justify-between text-sm">
-<span class="text-slate-600 font-semibold">المبلغ المطلوب:</span>
-<span id="modal-total" class="font-black acai-primary text-base">0.00 درهم</span>
-</div>
-</div>
-<div class="mb-4">
-<label class="block text-xs font-bold text-slate-700 mb-1">المبلغ المدفوع من العميل (درهم):</label>
-<input type="number" id="cash-given" oninput="calculateChange()" class="w-full border border-rose-200 rounded-2xl px-4 py-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-[#581c40]" placeholder="0.00">
-</div>
-<div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl mb-6 flex justify-between items-center">
-<span class="font-bold text-emerald-900 text-sm">المتبقي للعميل:</span>
-<span id="change-amount" class="text-xl font-black text-emerald-600">0.00 درهم</span>
-</div>
-<div class="flex gap-3">
-<button onclick="closeCashModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 rounded-2xl font-bold transition">إلغاء</button>
-<button onclick="completeOrder()" id="confirm-pay-btn" disabled class="flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition shadow-md">إرسال الطلب للآدمن</button>
-</div>
-</div>
-</div>
 
 <!-- Admin Approval Prompt Modal -->
 <div id="admin-approval-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-slate-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-purple-700">
 <h3 class="text-lg font-bold text-purple-300 mb-2">👮‍♂️ موافقة الآدمن على الطلب</h3>
-<p class="text-xs text-slate-400 mb-4">لتأكيد واعتماد الطلب وتخزينه نهائياً في متصفح العميل، يرجى كتابة رقم التأكيد (<span class="text-amber-400 font-bold">5</span>):</p>
-<input type="number" id="admin-approval-code" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-4 focus:outline-none focus:border-purple-500" placeholder="أدخل رقم 5 هنا">
+<p class="text-xs text-slate-400 mb-4">أدخل كود الاعتماد (مثال: 5) للموافقة على الطلب وتحويل حالته إلى تمت الموافقة:</p>
+<input type="password" id="admin-approval-code" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-4 focus:outline-none focus:border-purple-500" placeholder="أدخل الكود هنا">
 <div class="flex gap-2">
 <button onclick="closeAdminApprovalModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-3 rounded-2xl font-bold text-xs transition">إلغاء</button>
-<button onclick="confirmAdminApproval()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold text-xs transition shadow-md">موافقة وتسجيل الطلب</button>
+<button onclick="confirmAdminApproval()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold text-xs transition shadow-md">موافقة نهائية</button>
 </div>
 </div>
 </div>
@@ -206,83 +185,69 @@ background-color: #fcf8f5;
 <p class="text-xs text-amber-200/90 font-bold mt-1">✨ تطلب 3 مرات أي نوع، وفي المرة الرابعة يحصل العميل على حجم كبير مجاناً!</p>
 </div>
 <div class="mb-6 relative z-10">
-<p class="text-xs font-semibold mb-3 text-white/80">أختام الطلبات (الختم الرابع هو الجائزة الكبرى المجانية):</p>
+<p class="text-xs font-semibold mb-3 text-white/80">أختام الطلبات:</p>
 <div id="stamps-grid" class="grid grid-cols-4 gap-3"></div>
 </div>
 <button onclick="toggleLoyaltyModal()" class="w-full bg-white text-[#581c40] py-3.5 rounded-2xl font-bold hover:bg-rose-50 transition relative z-10 shadow-lg">إغلاق البطاقة</button>
 </div>
 </div>
 
-<!-- Success Order Modal -->
+<!-- Success / Pending Order Modal -->
 <div id="success-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border acai-border">
-<div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
-<h3 class="text-xl font-bold acai-primary mb-1">تم اعتماد وتسجيل الطلب بنجاح!</h3>
-<p class="text-sm text-slate-500 mb-4">تم حفظ طلبك في المتصفح، توجه إلى البوث لاستلامه.</p>
+<div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">⏳</div>
+<h3 class="text-xl font-bold acai-primary mb-1">تم إرسال طلبك بنجاح!</h3>
+<p class="text-sm text-slate-500 mb-4">طلبك حالياً **معلق** بانتظار موافقة الآدمن بالبوث.</p>
 <div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border acai-border space-y-1"></div>
-<button onclick="closeSuccessModal()" class="w-full acai-bg text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">طلب جديد</button>
+<button onclick="closeSuccessModal()" class="w-full acai-bg text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">حسناً</button>
 </div>
 </div>
 
-<!-- Script Application Logic -->
+<!-- Socket.io & Application Logic -->
 <script>
-const products = [
-{
-id: 1,
-name: 'أساي مقاس صغير',
-category: 'bowls',
-price: 3.00,
-image: 'https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=500',
-desc: 'كوب أساي طازج - مقاس صغير'
-},
-{
-id: 2,
-name: 'أساي مقاس كبير',
-category: 'bowls',
-price: 5.00,
-image: 'https://images.pexels.com/photos/8992928/pexels-photo-8992928.jpeg?auto=compress&cs=tinysrgb&w=500',
-desc: 'كوب أساي مشبع - مقاس كبير'
-},
-{
-id: 3,
-name: 'موز',
-category: 'toppings',
-price: 1.00,
-image: 'https://images.pexels.com/photos/2872755/pexels-photo-2872755.jpeg?auto=compress&cs=tinysrgb&w=500',
-desc: 'إضافة شرائح موز طازجة'
-},
-{
-id: 4,
-name: 'فراولة',
-category: 'toppings',
-price: 1.00,
-image: 'https://images.pexels.com/photos/934066/pexels-photo-934066.jpeg?auto=compress&cs=tinysrgb&w=500',
-desc: 'إضافة قطع فراولة طازجة'
-},
-{
-id: 5,
-name: 'توت أزرق',
-category: 'toppings',
-price: 1.00,
-image: 'https://images.pexels.com/photos/70862/pexels-photo-70862.jpeg?auto=compress&cs=tinysrgb&w=500',
-desc: 'إضافة توت أزرق طبيعي'
-},
-{
-id: 6,
-name: 'جرانولا',
-category: 'toppings',
-price: 1.00,
-image: 'https://images.pexels.com/photos/1359328/pexels-photo-1359328.jpeg?auto=compress&cs=tinysrgb&w=500',
-desc: 'إضافة جرانولا مقرمشة'
-},
-{
-id: 7,
-name: 'جوز هند',
-category: 'toppings',
-price: 1.00,
-image: 'https://images.pexels.com/photos/1414651/pexels-photo-1414651.jpeg?auto=compress&cs=tinysrgb&w=500',
-desc: 'إضافة جوز هند طازج'
+const socket = io();
+
+socket.on('connect', () => {
+const statusEl = document.getElementById('connection-status');
+statusEl.className = "text-[10px] bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-bold flex items-center gap-1";
+statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> متصل سحابياً`;
+});
+
+socket.on('disconnect', () => {
+const statusEl = document.getElementById('connection-status');
+statusEl.className = "text-[10px] bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full font-bold flex items-center gap-1";
+statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> انقطع الاتصال`;
+});
+
+socket.on('init_data', (data) => {
+adminOrders = data.orders;
+totalSales = data.totalSales;
+updateAdminDashboard();
+});
+
+socket.on('update_orders', (data) => {
+adminOrders = data.orders;
+totalSales = data.totalSales;
+updateAdminDashboard();
+});
+
+socket.on('approval_result', (res) => {
+if (res.success) {
+closeAdminApprovalModal();
+alert('✅ ' + res.message);
+} else {
+alert('⚠️ ' + res.message);
 }
+});
+
+const products = [
+{ id: 1, name: 'أساي مقاس صغير', category: 'bowls', price: 3.00, image: 'https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'كوب أساي طازج - مقاس صغير' },
+{ id: 2, name: 'أساي مقاس كبير', category: 'bowls', price: 5.00, image: 'https://images.pexels.com/photos/8992928/pexels-photo-8992928.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'كوب أساي مشبع - مقاس كبير' },
+{ id: 3, name: 'موز', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/2872755/pexels-photo-2872755.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة شرائح موز طازجة' },
+{ id: 4, name: 'فراولة', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/934066/pexels-photo-934066.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة قطع فراولة طازجة' },
+{ id: 5, name: 'توت أزرق', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/70862/pexels-photo-70862.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة توت أزرق طبيعي' },
+{ id: 6, name: 'جرانولا', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/1359328/pexels-photo-1359328.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة جرانولا مقرمشة' },
+{ id: 7, name: 'جوز هند', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/1414651/pexels-photo-1414651.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة جوز هند طازج' }
 ];
 
 let cart = [];
@@ -290,25 +255,12 @@ let currentCategory = 'all';
 let loyaltyPoints = 0; 
 let adminOrders = [];
 let totalSales = 0;
-let pendingOrderToApprove = null;
+let selectedOrderIdForApproval = null;
 
 window.onload = function() {
 renderProducts();
 renderStamps();
-loadStoredData();
 };
-
-function loadStoredData() {
-// استرجاع الطلبات المؤكدة المخزنة في المتصفح مسبقاً
-const savedOrders = localStorage.getItem('acai_saved_orders');
-if (savedOrders) {
-try {
-adminOrders = JSON.parse(savedOrders);
-totalSales = adminOrders.reduce((acc, o) => acc + o.total, 0);
-updateAdminDashboard();
-} catch(e) { console.error(e); }
-}
-}
 
 function openSecretAdminLogin() {
 document.getElementById('admin-pin-input').value = '';
@@ -442,135 +394,92 @@ checkoutBtn.disabled = false;
 checkoutBtn.className = "mt-6 w-full acai-bg hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition shadow-md cursor-pointer";
 }
 
-function openCashModal() {
+function submitOrder() {
 const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-document.getElementById('modal-total').innerText = `${total.toFixed(2)} درهم`;
-document.getElementById('cash-given').value = '';
-document.getElementById('change-amount').innerText = `0.00 درهم`;
-document.getElementById('confirm-pay-btn').disabled = true;
-document.getElementById('confirm-pay-btn').className = "flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
-document.getElementById('cash-modal').classList.remove('hidden');
-}
-
-function closeCashModal() {
-document.getElementById('cash-modal').classList.add('hidden');
-}
-
-function calculateChange() {
-const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-const cashGivenInput = document.getElementById('cash-given').value;
-const cashGiven = parseFloat(cashGivenInput) || 0;
-const change = cashGiven - total;
-const changeEl = document.getElementById('change-amount');
-const confirmBtn = document.getElementById('confirm-pay-btn');
-
-// الشرط المطلوب: لو كتب 999 يفتح له لوحة الآدمن فوراً
-if (cashGivenInput.trim() === '999') {
-closeCashModal();
-toggleAdminPanel();
-return;
-}
-
-if (cashGiven >= total) {
-changeEl.innerText = `${change.toFixed(2)} درهم`;
-changeEl.className = "text-xl font-black text-emerald-600";
-confirmBtn.disabled = false;
-confirmBtn.className = "flex-1 acai-bg hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition cursor-pointer shadow-md";
-} else {
-changeEl.innerText = `المبلغ المدفوع غير كافٍ`;
-changeEl.className = "text-xs font-bold text-rose-500";
-confirmBtn.disabled = true;
-confirmBtn.className = "flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
-}
-}
-
-function completeOrder() {
-const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
-const change = cashGiven - total;
-closeCashModal();
-
-// تجهيز الطلب كطلب معلق بانتظار موافقة الآدمن وإدخال الرقم 5
-pendingOrderToApprove = {
+const newOrder = {
 id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
 items: [...cart],
 total: total,
-cashGiven: cashGiven,
-change: change,
+status: 'pending',
 time: new Date().toLocaleTimeString('ar-AE')
 };
 
-// فتح نافذة موافقة الآدمن المطلوبة
+socket.emit('new_order', newOrder);
+
+let receiptHtml = `<div class="font-bold text-slate-700 border-b acai-border pb-1 mb-1">تفاصيل الطلب المعلق</div>`;
+cart.forEach(item => {
+receiptHtml += `<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>`;
+});
+receiptHtml += `<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>`;
+
+document.getElementById('receipt-details').innerHTML = receiptHtml;
+
+cart = [];
+updateCartUI();
+document.getElementById('success-modal').classList.remove('hidden');
+
+loyaltyPoints++;
+if (loyaltyPoints > 3) loyaltyPoints = 0;
+document.getElementById('loyalty-points').innerText = loyaltyPoints;
+document.getElementById('loyalty-card-points').innerText = `${loyaltyPoints} من 3`;
+renderStamps();
+}
+
+function promptAdminApproval(orderId) {
+selectedOrderIdForApproval = orderId;
 document.getElementById('admin-approval-code').value = '';
 document.getElementById('admin-approval-modal').classList.remove('hidden');
 }
 
 function closeAdminApprovalModal() {
 document.getElementById('admin-approval-modal').classList.add('hidden');
-pendingOrderToApprove = null;
+selectedOrderIdForApproval = null;
 }
 
 function confirmAdminApproval() {
 const code = document.getElementById('admin-approval-code').value.trim();
-// الشرط: إذا كتب الرقم 5 يتم الموافقة والتسجيل في المتصفح
-if (code === '5' && pendingOrderToApprove) {
-closeAdminApprovalModal();
-
-totalSales += pendingOrderToApprove.total;
-adminOrders.unshift(pendingOrderToApprove);
-
-// التخزين في المتصفح (LocalStorage) بحيث لو حدث ريفريش أو خرج يضل موجود
-localStorage.setItem('acai_saved_orders', JSON.stringify(adminOrders));
-updateAdminDashboard();
-
-let receiptHtml = `<div class="font-bold text-slate-700 border-b acai-border pb-1 mb-1">إيصال الدفع النقدي - Acai Bowls</div>`;
-pendingOrderToApprove.items.forEach(item => {
-receiptHtml += `<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>`;
-});
-receiptHtml += `<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${pendingOrderToApprove.total.toFixed(2)} د.إ</span></div>`;
-
-document.getElementById('receipt-details').innerHTML = receiptHtml;
-
-loyaltyPoints++;
-if (loyaltyPoints > 3) {
-loyaltyPoints = 0;
-alert('🎉 مبروك! لقد أكملت 3 طلبات وحصلت على كوب أساي كبير مجاناً في هذا الطلب!');
-}
-document.getElementById('loyalty-points').innerText = loyaltyPoints;
-document.getElementById('loyalty-card-points').innerText = `${loyaltyPoints} من 3`;
-renderStamps();
-
-cart = [];
-updateCartUI();
-document.getElementById('success-modal').classList.remove('hidden');
-pendingOrderToApprove = null;
-} else {
-alert('⚠️ رقم التأكيد غير صحيح! يجب كتابة الرقم 5 لموافقة الآدمن وتخزين الطلب.');
+if (selectedOrderIdForApproval) {
+socket.emit('approve_order', { orderId: selectedOrderIdForApproval, code: code });
 }
 }
 
 function updateAdminDashboard() {
-document.getElementById('admin-total-orders').innerText = adminOrders.length;
+const approvedOrdersCount = adminOrders.filter(o => o.status === 'approved').length;
+document.getElementById('admin-total-orders').innerText = approvedOrdersCount;
 document.getElementById('admin-total-sales').innerText = totalSales.toFixed(2) + ' درهم';
+
 const listContainer = document.getElementById('admin-orders-list');
 listContainer.innerHTML = '';
 if (adminOrders.length === 0) {
-listContainer.innerHTML = `<p class="text-slate-500 text-center py-4">لا توجد طلبات معتمدة حتى الآن.</p>`;
+listContainer.innerHTML = `<p class="text-slate-500 text-center py-4">لا توجد طلبات حتى الآن.</p>`;
 return;
 }
+
 adminOrders.forEach(ord => {
 const div = document.createElement('div');
-div.className = 'bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col gap-1';
+div.className = 'bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col gap-2';
 const itemsSummary = ord.items.map(i => `${i.name} (x${i.quantity})`).join('، ');
+
+let statusBadge = ord.status === 'approved' 
+? `<span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold">تمت الموافقة ✓</span>` 
+: `<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">معلق ⏳</span>`;
+
+let actionButton = ord.status === 'pending'
+? `<button onclick="promptAdminApproval('${ord.id}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] transition">موافقة وإدخال الكود</button>`
+: `<span class="text-emerald-400 text-[11px] font-bold">مكتمل ومعتمد</span>`;
+
 div.innerHTML = `
-<div class="flex justify-between font-bold text-slate-200">
+<div class="flex justify-between items-center font-bold text-slate-200">
 <span>طلب #${ord.id} (${ord.time})</span>
-<span class="text-emerald-400">${ord.total.toFixed(2)} درهم (موافق عليه)</span>
+<div class="flex items-center gap-2">
+<span class="text-emerald-400">${ord.total.toFixed(2)} درهم</span>
+${statusBadge}
+</div>
 </div>
 <div class="text-slate-400 text-[11px]">الأصناف: ${itemsSummary}</div>
-<div class="flex justify-between text-[11px] text-purple-300 border-t border-slate-800 pt-1 mt-1">
-<span>المدفوع كاش: ${ord.cashGiven.toFixed(2)} درهم</span>
-<span class="font-bold text-amber-300">الباقي للعميل: ${ord.change.toFixed(2)} درهم</span>
+<div class="flex justify-between items-center border-t border-slate-800 pt-1 mt-1">
+<span class="text-[10px] text-slate-400">الدفع: نقدي عند الاستلام من البوث</span>
+${actionButton}
 </div>
 `;
 listContainer.appendChild(div);
@@ -602,7 +511,7 @@ isStamped
 }`;
 
 if (isStamped) {
-stamp.innerHTML = `<span class="text-base">🥣</span><span class="text-[10px]">ختم ${i}</span>`;
+stamp.innerHTML = `<span class="text-base">🍇</span><span class="text-[10px]">ختم ${i}</span>`;
 } else if (isReward) {
 stamp.innerHTML = `<span class="text-base">🎁</span><span class="text-[9px] font-bold">مجاناً كبير</span>`;
 } else {
