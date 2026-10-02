@@ -26,7 +26,7 @@ background-color: #fcf8f5;
 </div>
 <div>
 <h1 class="text-xl font-black acai-primary tracking-wide">Acai Bowls</h1>
-<p class="text-xs text-rose-500 font-bold">نظام الكاشير والطلبات المباشرة</p>
+<p class="text-xs text-rose-500 font-bold">اطلب واستلم من البوث (دفع نقدي)</p>
 </div>
 </div>
 <div>
@@ -36,31 +36,46 @@ background-color: #fcf8f5;
 </div>
 </div>
 </header>
+
 <!-- Main Workspace -->
 <main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
 <!-- Products & Menu Section -->
 <div class="lg:col-span-2 space-y-6">
+<!-- Menu Banner / Image Preview -->
+<div class="bg-white rounded-3xl p-4 border acai-border shadow-sm">
+<h2 class="text-base font-bold acai-primary mb-3 flex items-center gap-2">
+<span>📋</span> قائمة المنتجات المعتمدة
+</h2>
+<div class="w-full h-48 bg-rose-50 rounded-2xl overflow-hidden border border-rose-100">
+<img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&auto=format&fit=crop&q=60" alt="Acai Menu" class="w-full h-full object-cover">
+</div>
+</div>
+
 <!-- Category Tabs -->
 <div class="flex gap-2 overflow-x-auto pb-2">
 <button onclick="filterCategory('all')" class="category-btn active px-5 py-2.5 rounded-2xl acai-bg text-white text-sm font-bold whitespace-nowrap shadow-sm transition">جميع المنتجات</button>
 <button onclick="filterCategory('bowls')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">أكواب الأساي الرئيسية</button>
 <button onclick="filterCategory('toppings')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">الإضافات الأخرى (+1 درهم)</button>
 </div>
+
 <!-- Products Grid -->
 <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <!-- Dynamically Rendered Products -->
 </div>
 </div>
+
 <!-- Order Summary & Checkout Section -->
 <div class="bg-white rounded-3xl shadow-sm border acai-border p-5 flex flex-col h-fit sticky top-20">
 <h2 class="text-lg font-bold border-b acai-border pb-3 mb-4 flex items-center justify-between acai-primary">
 <span>ملخص الطلب</span>
 <span id="item-count" class="bg-rose-100 text-[#581c40] text-xs px-3 py-1 rounded-full font-bold">0 عناصر</span>
 </h2>
+
 <!-- Cart Items -->
 <div id="cart-items" class="space-y-3 max-h-64 overflow-y-auto mb-4 divide-y divide-rose-50">
 <p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي أو إضافة!</p>
 </div>
+
 <!-- Total Calculation -->
 <div class="border-t acai-border pt-4 space-y-2 text-sm">
 <div class="flex justify-between text-slate-600">
@@ -76,16 +91,18 @@ background-color: #fcf8f5;
 <span id="total">0.00 درهم</span>
 </div>
 </div>
+
 <!-- Cash Payment Button -->
 <button onclick="openCashModal()" id="checkout-btn" disabled class="mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm">
-إتمام الطلب والدفع نقداً 💵
+إتمام الطلب والدفع نقداً بالبوث 💵
 </button>
 </div>
 </main>
+
 <!-- Cash Payment Modal -->
 <div id="cash-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border acai-border">
-<h3 class="text-xl font-bold acai-primary mb-2">الدفع النقدي (كاش) 💵</h3>
+<h3 class="text-xl font-bold acai-primary mb-2">الدفع النقدي (استلام من البوث) 💵</h3>
 <p class="text-sm text-slate-500 mb-4">أدخل المبلغ المستلم من العميل لحساب الباقي بدقة.</p>
 <div class="bg-rose-50/60 p-4 rounded-2xl mb-4 border acai-border">
 <div class="flex justify-between text-sm">
@@ -107,6 +124,7 @@ background-color: #fcf8f5;
 </div>
 </div>
 </div>
+
 <!-- Loyalty Card Modal -->
 <div id="loyalty-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-gradient-to-br from-[#581c40] to-[#7b2c59] text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
@@ -131,16 +149,18 @@ background-color: #fcf8f5;
 <button onclick="toggleLoyaltyModal()" class="w-full bg-white text-[#581c40] py-3.5 rounded-2xl font-bold hover:bg-rose-50 transition relative z-10 shadow-sm">إغلاق البطاقة</button>
 </div>
 </div>
+
 <!-- Success Order Modal -->
 <div id="success-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border acai-border">
 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
 <h3 class="text-xl font-bold acai-primary mb-1">تم إتمام الطلب بنجاح!</h3>
-<p class="text-sm text-slate-500 mb-4">تم تسجيل الدفع النقدي وإضافة ختم لبطاقة الولاء.</p>
+<p class="text-sm text-slate-500 mb-4">توجه إلى البوث لاستلام طلبك ودفع النقود.</p>
 <div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border acai-border space-y-1"></div>
 <button onclick="closeSuccessModal()" class="w-full acai-bg text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">طلب جديد</button>
 </div>
 </div>
+
 <!-- Script Application Logic -->
 <script>
 const products = [
@@ -149,7 +169,7 @@ id: 1,
 name: 'أساي مقاس صغير',
 category: 'bowls',
 price: 3.00,
-image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=500&auto=format&fit=crop&q=60',
 desc: 'كوب أساي طازج - مقاس صغير'
 },
 {
@@ -157,7 +177,7 @@ id: 2,
 name: 'أساي مقاس كبير',
 category: 'bowls',
 price: 5.00,
-image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60',
 desc: 'كوب أساي مشبع - مقاس كبير'
 },
 {
@@ -165,7 +185,7 @@ id: 3,
 name: 'موز',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500&auto=format&fit=crop&q=60',
 desc: 'إضافة شرائح موز طازجة'
 },
 {
@@ -173,7 +193,7 @@ id: 4,
 name: 'فراولة',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=500&auto=format&fit=crop&q=60',
 desc: 'إضافة قطع فراولة طازجة'
 },
 {
@@ -181,7 +201,7 @@ id: 5,
 name: 'توت أزرق',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+image: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=60',
 desc: 'إضافة توت أزرق طبيعي'
 },
 {
@@ -189,7 +209,7 @@ id: 6,
 name: 'جرانولا',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1517093788736-2979207af2d1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+image: 'https://images.unsplash.com/photo-1517093788736-2979207af2d1?w=500&auto=format&fit=crop&q=60',
 desc: 'إضافة جرانولا مقرمشة'
 },
 {
@@ -197,17 +217,20 @@ id: 7,
 name: 'جوز هند',
 category: 'toppings',
 price: 1.00,
-image: 'https://images.unsplash.com/photo-1588611846571-70bf812d6f78?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+image: 'https://images.unsplash.com/photo-1588611846571-70bf812d6f78?w=500&auto=format&fit=crop&q=60',
 desc: 'إضافة جوز هند طازج'
 }
 ];
+
 let cart = [];
 let currentCategory = 'all';
 let loyaltyPoints = 3;
+
 window.onload = function() {
 renderProducts();
 renderStamps();
 };
+
 function renderProducts() {
 const grid = document.getElementById('products-grid');
 grid.innerHTML = '';
@@ -216,10 +239,23 @@ filtered.forEach(product => {
 const card = document.createElement('div');
 card.className = 'bg-white border acai-border rounded-3xl p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer group overflow-hidden';
 card.onclick = () => addToCart(product.id);
-card.innerHTML = ⁠<div> <div class="w-full h-36 bg-rose-50 rounded-2xl overflow-hidden mb-3 border border-rose-100"> <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"> </div> <h3 class="font-bold acai-primary text-sm mb-1">${product.name}</h3> <p class="text-xs text-slate-400 mb-2">${product.desc}</p> </div> <div class="flex justify-between items-center mt-2 pt-3 border-t border-rose-50"> <span class="font-black acai-primary text-base">${product.price.toFixed(2)} درهم</span> <button class="bg-rose-100 text-[#581c40] text-xs px-3.5 py-2 rounded-xl font-bold group-hover:bg-[#581c40] group-hover:text-white transition shadow-sm">إضافة</button> </div>⁠;
+card.innerHTML = `
+<div>
+<div class="w-full h-36 bg-rose-50 rounded-2xl overflow-hidden mb-3 border border-rose-100">
+<img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+</div>
+<h3 class="font-bold acai-primary text-sm mb-1">${product.name}</h3>
+<p class="text-xs text-slate-400 mb-2">${product.desc}</p>
+</div>
+<div class="flex justify-between items-center mt-2 pt-3 border-t border-rose-50">
+<span class="font-black acai-primary text-base">${product.price.toFixed(2)} درهم</span>
+<button class="bg-rose-100 text-[#581c40] text-xs px-3.5 py-2 rounded-xl font-bold group-hover:bg-[#581c40] group-hover:text-white transition shadow-sm">إضافة</button>
+</div>
+`;
 grid.appendChild(card);
 });
 }
+
 function filterCategory(category) {
 currentCategory = category;
 document.querySelectorAll('.category-btn').forEach(btn => {
@@ -230,6 +266,7 @@ event.target.classList.remove('bg-white', 'text-slate-600', 'border', 'border-ro
 event.target.classList.add('acai-bg', 'text-white', 'shadow-sm');
 renderProducts();
 }
+
 function addToCart(productId) {
 const product = products.find(p => p.id === productId);
 const existing = cart.find(item => item.id === productId);
@@ -240,6 +277,7 @@ cart.push({ ...product, quantity: 1 });
 }
 updateCartUI();
 }
+
 function updateQuantity(productId, delta) {
 const item = cart.find(i => i.id === productId);
 if (item) {
@@ -250,6 +288,7 @@ cart = cart.filter(i => i.id !== productId);
 }
 updateCartUI();
 }
+
 function updateCartUI() {
 const container = document.getElementById('cart-items');
 const itemCountEl = document.getElementById('item-count');
@@ -257,15 +296,17 @@ const subtotalEl = document.getElementById('subtotal');
 const totalEl = document.getElementById('total');
 const checkoutBtn = document.getElementById('checkout-btn');
 container.innerHTML = '';
+
 if (cart.length === 0) {
-container.innerHTML = ⁠<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي أو إضافة!</p>⁠;
-itemCountEl.innerText = ⁠0 عناصر⁠;
-subtotalEl.innerText = ⁠0.00 درهم⁠;
-totalEl.innerText = ⁠0.00 درهم⁠;
+container.innerHTML = `<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي أو إضافة!</p>`;
+itemCountEl.innerText = `0 عناصر`;
+subtotalEl.innerText = `0.00 درهم`;
+totalEl.innerText = `0.00 درهم`;
 checkoutBtn.disabled = true;
 checkoutBtn.className = "mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm";
 return;
 }
+
 let totalItems = 0;
 let subtotal = 0;
 cart.forEach(item => {
@@ -273,79 +314,101 @@ totalItems += item.quantity;
 subtotal += item.price * item.quantity;
 const row = document.createElement('div');
 row.className = 'py-2.5 flex justify-between items-center';
-row.innerHTML = ⁠<div class="flex-grow"> <h4 class="text-xs font-bold acai-primary">${item.name}</h4> <span class="text-xs text-rose-500 font-bold">${(item.price * item.quantity).toFixed(2)} درهم</span> </div> <div class="flex items-center gap-2 bg-rose-50 rounded-xl p-1 border acai-border"> <button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">-</button> <span class="text-xs font-bold w-4 text-center acai-primary">${item.quantity}</span> <button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">+</button> </div>⁠;
+row.innerHTML = `
+<div class="flex-grow">
+<h4 class="text-xs font-bold acai-primary">${item.name}</h4>
+<span class="text-xs text-rose-500 font-bold">${(item.price * item.quantity).toFixed(2)} درهم</span>
+</div>
+<div class="flex items-center gap-2 bg-rose-50 rounded-xl p-1 border acai-border">
+<button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">-</button>
+<span class="text-xs font-bold w-4 text-center acai-primary">${item.quantity}</span>
+<button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">+</button>
+</div>
+`;
 container.appendChild(row);
 });
-itemCountEl.innerText = ⁠${totalItems} عناصر⁠;
-subtotalEl.innerText = ⁠${subtotal.toFixed(2)} درهم⁠;
-totalEl.innerText = ⁠${subtotal.toFixed(2)} درهم⁠;
+
+itemCountEl.innerText = `${totalItems} عناصر`;
+subtotalEl.innerText = `${subtotal.toFixed(2)} درهم`;
+totalEl.innerText = `${subtotal.toFixed(2)} درهم`;
 checkoutBtn.disabled = false;
 checkoutBtn.className = "mt-6 w-full acai-bg hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition shadow-md cursor-pointer";
 }
+
 function openCashModal() {
 const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-document.getElementById('modal-total').innerText = ⁠${total.toFixed(2)} درهم⁠;
+document.getElementById('modal-total').innerText = `${total.toFixed(2)} درهم`;
 document.getElementById('cash-given').value = '';
-document.getElementById('change-amount').innerText = ⁠0.00 درهم⁠;
+document.getElementById('change-amount').innerText = `0.00 درهم`;
 document.getElementById('confirm-pay-btn').disabled = true;
 document.getElementById('confirm-pay-btn').className = "flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
 document.getElementById('cash-modal').classList.remove('hidden');
 }
+
 function closeCashModal() {
 document.getElementById('cash-modal').classList.add('hidden');
 }
+
 function calculateChange() {
 const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
 const change = cashGiven - total;
 const changeEl = document.getElementById('change-amount');
 const confirmBtn = document.getElementById('confirm-pay-btn');
+
 if (cashGiven >= total) {
-changeEl.innerText = ⁠${change.toFixed(2)} درهم⁠;
+changeEl.innerText = `${change.toFixed(2)} درهم`;
 changeEl.className = "text-xl font-black text-emerald-600";
 confirmBtn.disabled = false;
 confirmBtn.className = "flex-1 acai-bg hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition cursor-pointer shadow-md";
 } else {
-changeEl.innerText = ⁠المبلغ المدفوع غير كافٍ⁠;
+changeEl.innerText = `المبلغ المدفوع غير كافٍ`;
 changeEl.className = "text-xs font-bold text-rose-500";
 confirmBtn.disabled = true;
 confirmBtn.className = "flex-1 acai-bg opacity-50 cursor-not-allowed text-white py-3.5 rounded-2xl font-bold transition";
 }
 }
+
 function completeOrder() {
 const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 const cashGiven = parseFloat(document.getElementById('cash-given').value) || 0;
 const change = cashGiven - total;
 closeCashModal();
-let receiptHtml = ⁠<div class="font-bold text-slate-700 border-b acai-border pb-1 mb-1">إيصال الدفع النقدي - Acai Bowls</div>⁠;
+
+let receiptHtml = `<div class="font-bold text-slate-700 border-b acai-border pb-1 mb-1">إيصال الدفع النقدي - Acai Bowls</div>`;
 cart.forEach(item => {
-receiptHtml += ⁠<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>⁠;
+receiptHtml += `<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>`;
 });
-receiptHtml += ⁠<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>⁠;
-receiptHtml += ⁠<div class="flex justify-between text-slate-500"><span>المسدد كاش:</span><span>${cashGiven.toFixed(2)} د.إ</span></div>⁠;
-receiptHtml += ⁠<div class="flex justify-between text-emerald-600 font-bold"><span>الباقي للعميل:</span><span>${change.toFixed(2)} د.إ</span></div>⁠;
+receiptHtml += `<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>`;
+receiptHtml += `<div class="flex justify-between text-slate-500"><span>المسدد كاش:</span><span>${cashGiven.toFixed(2)} د.إ</span></div>`;
+receiptHtml += `<div class="flex justify-between text-emerald-600 font-bold"><span>الباقي للعميل:</span><span>${change.toFixed(2)} د.إ</span></div>`;
+
 document.getElementById('receipt-details').innerHTML = receiptHtml;
 loyaltyPoints = Math.min(10, loyaltyPoints + 1);
 document.getElementById('loyalty-points').innerText = loyaltyPoints;
-document.getElementById('loyalty-card-points').innerText = ⁠${loyaltyPoints} نقاط⁠;
+document.getElementById('loyalty-card-points').innerText = `${loyaltyPoints} نقاط`;
 renderStamps();
+
 cart = [];
 updateCartUI();
 document.getElementById('success-modal').classList.remove('hidden');
 }
+
 function closeSuccessModal() {
 document.getElementById('success-modal').classList.add('hidden');
 }
+
 function toggleLoyaltyModal() {
 document.getElementById('loyalty-modal').classList.toggle('hidden');
 }
+
 function renderStamps() {
 const grid = document.getElementById('stamps-grid');
 grid.innerHTML = '';
 for (let i = 1; i <= 10; i++) {
 const stamp = document.createElement('div');
 const isStamped = i <= loyaltyPoints;
-stamp.className = ⁠h-11 rounded-2xl flex items-center justify-center font-bold text-xs border ${ isStamped ? 'bg-amber-400 text-indigo-950 border-amber-300 shadow-sm' : 'bg-white/5 border-white/10 text-white/40' }⁠;
+stamp.className = `h-11 rounded-2xl flex items-center justify-center font-bold text-xs border ${ isStamped ? 'bg-amber-400 text-indigo-950 border-amber-300 shadow-sm' : 'bg-white/5 border-white/10 text-white/40' }`;
 stamp.innerHTML = isStamped ? '🥣' : i;
 grid.appendChild(stamp);
 }
