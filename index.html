@@ -21,8 +21,8 @@ background-color: #fcf8f5;
 <header class="bg-white border-b acai-border shadow-sm sticky top-0 z-40">
 <div class="container mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center space-x-3 space-x-reverse">
-<!-- زر سري مخفي للوصول للآدمن عند الضغط المطول أو النقر المزدوج على شعار المتجر -->
-<div ondblclick="openSecretAdminLogin()" class="w-12 h-12 rounded-full acai-bg flex items-center justify-center text-white text-2xl shadow-md overflow-hidden border-2 border-rose-200 cursor-pointer title='انقر مرتين للتحكم الإداري'" title="اضغط مرتين للوحة التحكم">
+<!-- زر سري مخفي للوصول للآدمن عند النقر المزدوج على الشعار -->
+<div ondblclick="openSecretAdminLogin()" class="w-12 h-12 rounded-full acai-bg flex items-center justify-center text-white text-2xl shadow-md overflow-hidden border-2 border-rose-200 cursor-pointer" title="انقر مرتين للتحكم الإداري">
 🍇
 </div>
 <div>
@@ -47,12 +47,12 @@ background-color: #fcf8f5;
 </div>
 <p class="text-xs text-slate-400 mb-4">أدخل الرمز السري الخاص بالمدير للوصول للوحة المبيعات:</p>
 <input type="password" id="admin-pin-input" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-3 focus:outline-none focus:border-purple-500" placeholder="••••">
-<p id="admin-login-error" class="text-xs text-rose-400 mb-3 hidden text-center">الرمز السري غير صحيح!</p>
+<p id="admin-login-error" class="text-xs text-rose-400 mb-3 hidden text-center">الرمز السري غير صحيح! (الافتراضي: 1234)</p>
 <button onclick="verifyAdminPin()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold transition">دخول لوحة التحكم</button>
 </div>
 </div>
 
-<!-- Admin / Cashier Dashboard Section (Hidden by default, protected) -->
+<!-- Admin / Cashier Dashboard Section -->
 <div id="admin-panel" class="hidden bg-slate-900 text-white border-b border-purple-900 py-6 px-4 shadow-inner">
 <div class="container mx-auto max-w-6xl">
 <div class="flex justify-between items-center mb-4">
@@ -90,13 +90,13 @@ background-color: #fcf8f5;
 <main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
 <!-- Products & Menu Section -->
 <div class="lg:col-span-2 space-y-6">
-<!-- Official Menu Image Banner -->
+<!-- Official Menu Image Banner (تم اعتماد صورة الأساي الجديدة) -->
 <div class="bg-white rounded-3xl p-4 border acai-border shadow-sm text-center">
 <h2 class="text-base font-bold acai-primary mb-3 flex items-center justify-center gap-2">
 <span>⭐</span> قائمة المنيو الرسمية المعتمدة
 </h2>
 <div class="w-full max-h-96 bg-rose-50 rounded-2xl overflow-hidden border border-rose-100 inline-block p-2">
-<img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&auto=format&fit=crop&q=80" alt="Acai Official Menu" class="w-full h-full object-cover max-h-[350px] rounded-xl">
+<img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80" alt="Acai Official Menu" class="w-full h-full object-cover max-h-[350px] rounded-xl">
 </div>
 </div>
 
@@ -219,7 +219,7 @@ id: 1,
 name: 'أساي مقاس صغير',
 category: 'bowls',
 price: 3.00,
-image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=500&auto=format&fit=crop&q=80',
+image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80',
 desc: 'كوب أساي طازج - مقاس صغير'
 },
 {
@@ -227,7 +227,7 @@ id: 2,
 name: 'أساي مقاس كبير',
 category: 'bowls',
 price: 5.00,
-image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80',
+image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=500&auto=format&fit=crop&q=80',
 desc: 'كوب أساي مشبع - مقاس كبير'
 },
 {
@@ -274,7 +274,7 @@ desc: 'إضافة جوز هند طازج'
 
 let cart = [];
 let currentCategory = 'all';
-let loyaltyPoints = 0; // من 0 إلى 3 (والرابعة مكافأة)
+let loyaltyPoints = 0; 
 let adminOrders = [];
 let totalSales = 0;
 
@@ -283,7 +283,6 @@ renderProducts();
 renderStamps();
 };
 
-// وظائف التحكم السري بالآدمن عبر كلمة مرور (PIN)
 function openSecretAdminLogin() {
 document.getElementById('admin-pin-input').value = '';
 document.getElementById('admin-login-error').classList.add('hidden');
@@ -296,7 +295,6 @@ document.getElementById('admin-login-modal').classList.add('hidden');
 
 function verifyAdminPin() {
 const pin = document.getElementById('admin-pin-input').value;
-// الرمز الافتراضي السري للآدمن هو 1234 (يمكن تغييره حسب الرغبة)
 if (pin === '1234') {
 closeAdminLoginModal();
 toggleAdminPanel();
@@ -477,7 +475,6 @@ receiptHtml += `<div class="border-t acai-border pt-1 mt-1 font-bold flex justif
 
 document.getElementById('receipt-details').innerHTML = receiptHtml;
 
-// نظام الولاء: تطلب 3 مرات وفي الرابعة حجم كبير مجاناً
 loyaltyPoints++;
 if (loyaltyPoints > 3) {
 loyaltyPoints = 0;
