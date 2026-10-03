@@ -4,205 +4,435 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر أساي - Acai Bowls</title>
-    <!-- مكتبة Socket.io للاتصال بالسيرفر -->
+    <!-- مكتبة Socket.io للاتصال بالسيرفر اللحظي -->
     <script src="/socket.io/socket.io.js"></script>
     <style>
+        :root {
+            --primary-color: #6a1b39;
+            --secondary-color: #a93255;
+            --bg-color: #fbf9f8;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
         body {
             font-family: Tahoma, sans-serif;
-            background-color: #fcf8f7;
+            background-color: var(--bg-color);
             margin: 0;
             padding: 0;
-            color: #333;
-            text-align: center;
+            color: var(--text-color);
         }
         header {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            cursor: pointer;
-            user-select: none;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6a1b39;
-        }
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 15px;
-        }
-        .menu-section {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .card {
-            background: #fff;
-            border-radius: 15px;
-            padding: 15px;
-            width: 45%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        .card h3 {
-            margin: 10px 0 5px;
-            color: #6a1b39;
-        }
-        .price {
-            background-color: #a93255;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-        .addons-box {
-            background: #fff;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-            text-align: right;
-        }
-        .addons-box h3 {
-            text-align: center;
-            color: #6a1b39;
-        }
-        .addon-item {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 8px 0;
-            padding: 5px;
-            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .btn {
-            background-color: #6a1b39;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .loyalty-badge {
+            background-color: #fde8ed;
+            color: var(--secondary-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px solid #f5c6cb;
+        }
+        .server-status {
+            background-color: #e2f0d9;
+            color: #385723;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .logo-text h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        .logo-text p {
+            margin: 0;
+            font-size: 11px;
+            color: #777;
+        }
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* سلة وملخص الطلب */
+        .cart-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f2f2f2;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .items-count {
+            background: #fde8ed;
+            color: var(--secondary-color);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .cart-items-list {
+            min-height: 100px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            text-align: right;
+            font-size: 14px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+        }
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .cart-total-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-top: 2px solid #f2f2f2;
+            padding-top: 10px;
+        }
+        .checkout-btn {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 25px;
-            cursor: pointer;
             width: 100%;
-            margin-top: 10px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .btn:hover {
+        .checkout-btn:hover {
             background-color: #4e1229;
         }
+
+        /* المنتجات والقائمة */
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .banner-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .banner-title {
+            color: var(--secondary-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .banner-img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .categories-bar {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .cat-btn {
+            background: var(--card-bg);
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .cat-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
+        }
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .product-card h3 {
+            margin: 10px 0 5px;
+            font-size: 16px;
+            color: var(--primary-color);
+        }
+        .product-price {
+            background: var(--secondary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+        .add-to-cart-btn {
+            background: #fde8ed;
+            color: var(--secondary-color);
+            border: 1px solid #f5c6cb;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .add-to-cart-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
         /* لوحة الآدمن */
         #admin-panel {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
-        .admin-content {
+        .admin-box {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 85%;
-            max-width: 550px;
-            text-align: right;
-            max-height: 80vh;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
             overflow-y: auto;
+            text-align: right;
         }
         .close-admin {
             background: red;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 6px 12px;
+            border-radius: 5px;
             cursor: pointer;
             float: left;
-            border-radius: 5px;
         }
-        .order-card {
+        .admin-order-card {
             background: #f9f9f9;
             border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 12px;
             border-radius: 8px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- شعار المتجر (انقر مرتين ورا بعض لفتح صفحة الآدمن) -->
-    <header ondblclick="openAdminLogin()">
-        <div class="logo">🍇 Acai Bowls متجر الأساي</div>
-        <p style="font-size: 12px; color: #888; margin: 5px 0 0;">انقر مرتين على الشعار لدخول لوحة الإدارة</p>
+    <!-- الهيدر العلوي -->
+    <header>
+        <div class="header-left">
+            <div class="loyalty-badge">🎟️ بطاقة الولاء ( 0 / 3 )</div>
+            <div class="server-status">🟢 متصل بالسحاب</div>
+        </div>
+        <!-- شعار المتجر (اضغط مرتين ورا بعض لفتح الآدمن وادخل 1234) -->
+        <div class="logo-area" ondblclick="openAdminLogin()">
+            <div class="logo-text">
+                <h2>Acai Bowls</h2>
+                <p>اطلب واستلم من البوت (متصل سحابياً)</p>
+            </div>
+            <!-- استبدل الرابط أدناه برابط صورة شعار العنب الحقيقي لديك -->
+            <img src="https://i.ibb.co/3s83sQ4/acai-logo.png" alt="شعار المتجر" class="logo-img" onerror="this.src='https://images.unsplash.com/photo-1590301157890-4810ed352733?w=100'">
+        </div>
     </header>
 
-    <div class="container">
-        <!-- قسم الأطباق -->
-        <div class="menu-section">
-            <div class="card">
-                <h3>أساي مقاس صغير</h3>
-                <div class="price">3 دراهم</div>
-                <label><input type="checkbox" class="bowl-select" data-name="أساي صغير" data-price="3"> اختر</label>
+    <div class="main-container">
+        <!-- قسم ملخص الطلب والسلة -->
+        <div class="cart-section">
+            <div class="cart-header">
+                <h3>ملخص الطلب</h3>
+                <span class="items-count" id="cart-count">0 عناصر</span>
             </div>
-            <div class="card">
-                <h3>أساي مقاس كبير</h3>
-                <div class="price">5 دراهم</div>
-                <label><input type="checkbox" class="bowl-select" data-name="أساي كبير" data-price="5"> اختر</label>
+            <div class="cart-items-list" id="cart-items">
+                <p style="color: #999; text-align: center; margin-top: 30px;">السلة فارغة، اختر أساي أو إضافة!</p>
             </div>
+            <div class="cart-summary-row">
+                <span>المجموع الفرعي:</span>
+                <span id="subtotal">0.00 درهم</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>الضريبة:</span>
+                <span>0.00 درهم</span>
+            </div>
+            <div class="cart-total-row">
+                <span>الإجمالي النهائي:</span>
+                <span id="grand-total">0.00 درهم</span>
+            </div>
+            <button class="checkout-btn" onclick="submitOrder()">إرسال الطلب (دفع نقدي بالبوت) 🛒</button>
         </div>
 
-        <!-- قسم الإضافات -->
-        <div class="addons-box">
-            <h3>إضافات أخرى (+1 درهم لكل إضافة)[span_0](start_span)[span_0](end_span)</h3>
-            <div class="addon-item">
-                <span>🍌 موز</span>
-                <input type="checkbox" class="addon-select" data-name="موز" data-price="1">
+        <!-- قسم المنتجات والمنيو -->
+        <div class="content-section">
+            <!-- بنر المنيو الرسمي -->
+            <div class="banner-card">
+                <div class="banner-title">⭐ قائمة المنيو الرسمية المعتمدة ⭐</div>
+                <!-- صورة أطباق الأساي الكبيرة والصغيرة -->
+                <img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800" alt="أساي بولز" class="banner-img">
             </div>
-            <div class="addon-item">
-                <span>🍓 فراولة</span>
-                <input type="checkbox" class="addon-select" data-name="فراولة" data-price="1">
+
+            <!-- أزرار التصنيفات -->
+            <div class="categories-bar">
+                <button class="cat-btn active">جميع المنتجات</button>
+                <button class="cat-btn">أكواب الأساي الرئيسية</button>
+                <button class="cat-btn">الإضافات الأخرى (+1 درهم)</button>
             </div>
-            <div class="addon-item">
-                <span>🫐 توت أزرق</span>
-                <input type="checkbox" class="addon-select" data-name="توت أزرق" data-price="1">
-            </div>
-            <div class="addon-item">
-                <span>🥜 جرانولا</span>
-                <input type="checkbox" class="addon-select" data-name="جرانولا" data-price="1">
-            </div>
-            <div class="addon-item">
-                <span>🥥 جوز هند</span>
-                <input type="checkbox" class="addon-select" data-name="جوز هند" data-price="1">
+
+            <!-- شبكة المنتجات (أساي صغير، كبير، وإضافات) -->
+            <div class="products-grid">
+                <!-- أساي صغير -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=300" alt="أساي صغير" class="product-img">
+                    <h3>أساي مقاس صغير</h3>
+                    <div class="product-price">3 دراهم</div>
+                    <button class="add-to-cart-btn" onclick="addToCart('أساي مقاس صغير', 3)">إضافة للسلة</button>
+                </div>
+                <!-- أساي كبير -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=300" alt="أساي كبير" class="product-img">
+                    <h3>أساي مقاس كبير</h3>
+                    <div class="product-price">5 دراهم</div>
+                    <button class="add-to-cart-btn" onclick="addToCart('أساي مقاس كبير', 5)">إضافة للسلة</button>
+                </div>
+                <!-- إضافة موز -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300" alt="موز" class="product-img">
+                    <h3>موز 🍌</h3>
+                    <div class="product-price">1 درهم</div>
+                    <button class="add-to-cart-btn" onclick="addToCart('إضافة موز', 1)">إضافة للسلة</button>
+                </div>
+                <!-- إضافة فراولة -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=300" alt="فراولة" class="product-img">
+                    <h3>فراولة 🍓</h3>
+                    <div class="product-price">1 درهم</div>
+                    <button class="add-to-cart-btn" onclick="addToCart('إضافة فراولة', 1)">إضافة للسلة</button>
+                </div>
+                <!-- إضافة توت أزرق -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=300" alt="توت أزرق" class="product-img">
+                    <h3>توت أزرق 🫐</h3>
+                    <div class="product-price">1 درهم</div>
+                    <button class="add-to-cart-btn" onclick="addToCart('إضافة توت أزرق', 1)">إضافة للسلة</button>
+                </div>
+                <!-- إضافة جرانولا -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300" alt="جرانولا" class="product-img">
+                    <h3>جرانولا 🥜</h3>
+                    <div class="product-price">1 درهم</div>
+                    <button class="add-to-cart-btn" onclick="addToCart('إضافة جرانولا', 1)">إضافة للسلة</button>
+                </div>
+                <!-- إضافة جوز هند -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" alt="جوز هند" class="product-img">
+                    <h3>جوز هند 🥥</h3>
+                    <div class="product-price">1 درهم</div>
+                    <button class="add-to-cart-btn" onclick="addToCart('إضافة جوز هند', 1)">إضافة للسلة</button>
+                </div>
             </div>
         </div>
-
-        <button class="btn" onclick="submitOrder()">إتمام الطلب</button>
     </div>
 
     <!-- لوحة الآدمن المخفية -->
     <div id="admin-panel">
-        <div class="admin-content">
+        <div class="admin-box">
             <button class="close-admin" onclick="closeAdmin()">إغلاق</button>
             <h2>لوحة إدارة الطلبات</h2>
-            <p>إجمالي المبيعات: <span id="total-sales">0</span> درهم</p>
-            <div id="orders-list">جاري تحميل الطلبات...</div>
+            <p>إجمالي المبيعات المعتمدة: <span id="admin-total-sales">0</span> درهم</p>
+            <div id="admin-orders-container">جاري التحميل...</div>
         </div>
     </div>
 
     <script>
         const socket = io();
 
+        let cart = [];
         let globalOrders = [];
         let totalSales = 0;
 
-        // استقبال البيانات الأولية والتحديثات من السيرفر
+        // الاتصال واستقبال البيانات
         socket.on('init_data', (data) => {
             globalOrders = data.orders;
             totalSales = data.totalSales;
@@ -220,47 +450,72 @@
             if(res.success) updateAdminUI();
         });
 
-        // إرسال طلب جديد للسيرفر
-        function submitOrder() {
-            let selectedBowls = [];
-            let bowlsTotal = 0;
-            document.querySelectorAll('.bowl-select:checked').forEach(el => {
-                let p = parseInt(el.dataset.price);
-                selectedBowls.push({ name: el.dataset.name, price: p });
-                bowlsTotal += p;
-            });
+        // إضافة منتج للسلة
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateCartUI();
+        }
 
-            let selectedAddons = [];
-            let addonsTotal = 0;
-            document.querySelectorAll('.addon-select:checked').forEach(el => {
-                let p = parseInt(el.dataset.price);
-                selectedAddons.push({ name: el.dataset.name, price: p });
-                addonsTotal += p;
-            });
+        // تحديث واجهة السلة
+        function updateCartUI() {
+            const listEl = document.getElementById('cart-items');
+            const countEl = document.getElementById('cart-count');
+            const subtotalEl = document.getElementById('subtotal');
+            const grandTotalEl = document.getElementById('grand-total');
 
-            if (selectedBowls.length === 0) {
-                alert('الرجاء اختيار حجم أساي واحد على الأقل.');
+            countEl.innerText = cart.length + ' عناصر';
+
+            if (cart.length === 0) {
+                listEl.innerHTML = '<p style="color: #999; text-align: center; margin-top: 30px;">السلة فارغة، اختر أساي أو إضافة!</p>';
+                subtotalEl.innerText = '0.00 درهم';
+                grandTotalEl.innerText = '0.00 درهم';
                 return;
             }
 
+            let html = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                total += item.price;
+                html += `<div class="cart-item">
+                    <span>${item.name}</span>
+                    <span>${item.price}.00 درهم <button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; cursor:pointer;">❌</button></span>
+                </div>`;
+            });
+
+            listEl.innerHTML = html;
+            subtotalEl.innerText = total.toFixed(2) + ' درهم';
+            grandTotalEl.innerText = total.toFixed(2) + ' درهم';
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // إرسال الطلب للسيرفر
+        function submitOrder() {
+            if (cart.length === 0) {
+                alert('السلة فارغة!');
+                return;
+            }
+
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+
             let orderData = {
                 id: 'ord_' + Date.now(),
-                bowls: selectedBowls,
-                addons: selectedAddons,
-                total: bowlsTotal + addonsTotal,
+                items: [...cart],
+                total: total,
                 status: 'pending',
                 date: new Date().toLocaleTimeString()
             };
 
-            // إرسال الطلب عبر Socket.io بناءً على السيرفر الخاص بك
             socket.emit('new_order', orderData);
-            alert('تم إرسال طلبك بنجاح!');
-            
-            // إعادة ضبط الاختيارات
-            document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+            alert('تم إرسال طلبك بنجاح إلى النظام!');
+            cart = [];
+            updateCartUI();
         }
 
-        // فتح لوحة الآدمن بالنقر المزدوج وكلمة السر 1234
+        // فتح الآدمن بالضغط مرتين على الشعار
         function openAdminLogin() {
             let pass = prompt('الرجاء إدخال كلمة السر لصفحة الآدمن:');
             if (pass === '1234') {
@@ -275,43 +530,35 @@
             document.getElementById('admin-panel').style.display = 'none';
         }
 
-        // تحديث واجهة الآدمن بالطلبات الحالية
+        // تحديث شاشة الآدمن
         function updateAdminUI() {
-            document.getElementById('total-sales').innerText = totalSales;
-            let listDiv = document.getElementById('orders-list');
-            
+            document.getElementById('admin-total-sales').innerText = totalSales;
+            let container = document.getElementById('admin-orders-container');
+
             if (globalOrders.length === 0) {
-                listDiv.innerHTML = '<p>لا توجد طلبات حالياً.</p>';
+                container.innerHTML = '<p>لا توجد طلبات واردة حالياً.</p>';
                 return;
             }
 
             let html = '';
             globalOrders.forEach((order) => {
-                let statusText = order.status === 'pending' ? 'قيد الانتظار ⏳' : 'تم الاعتماد ✅';
-                html += `<div class="order-card">
-                    <p><strong>التوقيت:</strong> ${order.date} | <strong>الحالة:</strong> ${statusText}</p>
-                    <p><strong>الأطباق:</strong></p><ul>`;
-                order.bowls.forEach(b => html += `<li>${b.name} (${b.price} درهم)</li>`);
-                html += `</ul>`;
-                
-                if(order.addons && order.addons.length > 0) {
-                    html += `<p><strong>الإضافات:</strong> `;
-                    order.addons.forEach(a => html += `${a.name} `);
-                    html += `</p>`;
-                }
-                html += `<p><strong>المجموع:</strong> ${order.total} درهم</p>`;
-                
+                let statusBadge = order.status === 'pending' ? 'قيد الانتظار ⏳' : 'تم الاعتماد ✅';
+                html += `<div class="admin-order-card">
+                    <p><strong>الوقت:</strong> ${order.date} | <strong>الحالة:</strong> ${statusBadge}</p>
+                    <p><strong>المنتجات:</strong></p><ul>`;
+                order.items.forEach(i => html += `<li>${i.name} - ${i.price} درهم</li>`);
+                html += `</ul><p><strong>المجموع:</strong> ${order.total} درهم</p>`;
+
                 if(order.status === 'pending') {
-                    html += `<button onclick="approveOrder('${order.id}')" style="background:green; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:4px;">اعتماد الطلب</button>`;
+                    html += `<button onclick="approveOrder('${order.id}')" style="background:green; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer;">اعتماد الطلب</button>`;
                 }
                 html += `</div>`;
             });
-            listDiv.innerHTML = html;
+            container.innerHTML = html;
         }
 
-        // اعتماد الطلب (يتطلب كود الاعتماد 5 كما هو محدد في server.js)
         function approveOrder(orderId) {
-            let code = prompt('أدخل كود الاعتماد (ملاحظة: السيرفر يطلب الكود 5):');
+            let code = prompt('أدخل كود الاعتماد الخاص بالسيرفر (كود السيرفر هو 5):');
             if (code) {
                 socket.emit('approve_order', { orderId, code });
             }
