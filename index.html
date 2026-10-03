@@ -1,527 +1,273 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أساي بولة - نظام الطلب والكاشير السحابي</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- مكتبة الاتصال اللحظي بالسيرفر السحابي -->
-<script src="/socket.io/socket.io.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<style>
-body {
-font-family: 'Cairo', sans-serif;
-background-color: #fcf8f5;
-}
-.acai-primary { color: #581c40; }
-.acai-bg { background-color: #581c40; }
-.acai-border { border-color: #f1d3e0; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر أساي - Acai Bowls</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            background-color: #fcf8f7;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            text-align: center;
+        }
+        header {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6a1b39;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 15px;
+        }
+        .menu-section {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 15px;
+            width: 45%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .card h3 {
+            margin: 10px 0 5px;
+            color: #6a1b39;
+        }
+        .price {
+            background-color: #a93255;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .addons-box {
+            background: #fff;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .addons-box h3 {
+            text-align: center;
+            color: #6a1b39;
+        }
+        .addon-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .btn {
+            background-color: #6a1b39;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #4e1229;
+        }
+        /* لوحة الآدمن */
+        #admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .admin-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            text-align: right;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-admin {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            float: left;
+            border-radius: 5px;
+        }
+    </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col">
+<body>
 
-<!-- Header & Branding -->
-<header class="bg-white border-b acai-border shadow-sm sticky top-0 z-40">
-<div class="container mx-auto px-4 py-3 flex justify-between items-center">
-<div class="flex items-center space-x-3 space-x-reverse">
-<!-- زر سري مخفي للوصول للآدمن عند النقر المزدوج على الشعار -->
-<div ondblclick="openSecretAdminLogin()" class="w-12 h-12 rounded-full acai-bg flex items-center justify-center text-white text-2xl shadow-md overflow-hidden border-2 border-rose-200 cursor-pointer" title="انقر مرتين للتحكم الإداري">
-🍇
-</div>
-<div>
-<h1 class="text-xl font-black acai-primary tracking-wide">Acai Bowls</h1>
-<p class="text-xs text-rose-500 font-bold">اطلب واستلم من البوث (متصل سحابياً)</p>
-</div>
-</div>
-<div class="flex items-center gap-2">
-<span id="connection-status" class="text-[10px] bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full font-bold flex items-center gap-1">
-<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> جاري الاتصال...
-</span>
-<button onclick="toggleLoyaltyModal()" class="bg-rose-50 hover:bg-rose-100 text-[#581c40] px-4 py-2.5 rounded-2xl text-sm font-bold transition flex items-center gap-2 shadow-sm border acai-border">
-<span>🎟️</span> بطاقة الولاء (<span id="loyalty-points">0</span>/3)
-</button>
-</div>
-</div>
-</header>
+    <!-- شعار المتجر (انقر مرتين لفتح صفحة الآدمن) -->
+    <header ondblclick="openAdminLogin()">
+        <div class="logo">🍇 Acai Bowls متجر الأساي</div>
+        <p style="font-size: 12px; color: #888; margin: 5px 0 0;">انقر مرتين على الشعار للدخول للآدمن</p>
+    </header>
 
-<!-- Hidden Admin Login Modal -->
-<div id="admin-login-modal" class="fixed inset-0 bg-[#581c40]/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-<div class="bg-slate-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-purple-900">
-<div class="flex justify-between items-center mb-4">
-<h3 class="text-base font-bold text-purple-300">🔐 بوابة المالك المشفرة</h3>
-<button onclick="closeAdminLoginModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
-</div>
-<p class="text-xs text-slate-400 mb-4">أدخل الرمز السري الخاص بالمدير (الافتراضي: 1234):</p>
-<input type="password" id="admin-pin-input" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-3 focus:outline-none focus:border-purple-500" placeholder="••••">
-<p id="admin-login-error" class="text-xs text-rose-400 mb-3 hidden text-center">الرمز السري غير صحيح!</p>
-<button onclick="verifyAdminPin()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold transition">دخول لوحة التحكم</button>
-</div>
-</div>
+    <div class="container">
+        <!-- قسم الأطباق -->
+        <div class="menu-section">
+            <div class="card">
+                <h3>أساي مقاس صغير</h3>
+                <div class="price">3 دراهم</div>
+                <label><input type="checkbox" class="bowl-select" data-name="أساي صغير" data-price="3"> اختر</label>
+            </div>
+            <div class="card">
+                <h3>أساي مقاس كبير</h3>
+                <div class="price">5 دراهم</div>
+                <label><input type="checkbox" class="bowl-select" data-name="أساي كبير" data-price="5"> اختر</label>
+            </div>
+        </div>
 
-<!-- Admin / Cashier Dashboard Section -->
-<div id="admin-panel" class="hidden bg-slate-900 text-white border-b border-purple-900 py-6 px-4 shadow-inner">
-<div class="container mx-auto max-w-6xl">
-<div class="flex justify-between items-center mb-4">
-<h2 class="text-lg font-black text-purple-300 flex items-center gap-2">
-<span>📊</span> لوحة تحكم صاحب المتجر (سحابية لحظية)
-</h2>
-<button onclick="toggleAdminPanel()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-3 py-1.5 rounded-xl">إغلاق اللوحة ✕</button>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-<div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-<p class="text-xs text-slate-400 mb-1">إجمالي الطلبات المقبولة</p>
-<p id="admin-total-orders" class="text-2xl font-black text-amber-400">0</p>
-</div>
-<div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-<p class="text-xs text-slate-400 mb-1">إجمالي المبيعات المؤكدة</p>
-<p id="admin-total-sales" class="text-2xl font-black text-emerald-400">0.00 درهم</p>
-</div>
-<div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-<p class="text-xs text-slate-400 mb-1">حالة السيرفر</p>
-<p class="text-sm font-bold text-emerald-400 flex items-center gap-1 mt-1">
-<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> متصل بالسحاب لحظياً
-</p>
-</div>
-</div>
-<div class="bg-slate-800 rounded-2xl p-4 border border-slate-700">
-<h3 class="text-sm font-bold text-slate-300 mb-3">سجل الطلبات الواردة (تتطلب موافقة الآدمن بالكود 5):</h3>
-<div id="admin-orders-list" class="space-y-3 max-h-64 overflow-y-auto text-xs">
-<p class="text-slate-500 text-center py-4">لا توجد طلبات حتى الآن.</p>
-</div>
-</div>
-</div>
-</div>
+        <!-- قسم الإضافات -->
+        <div class="addons-box">
+            <h3>إضافات أخرى (+1 درهم لكل إضافة)[span_2](start_span)[span_2](end_span)</h3>
+            <div class="addon-item">
+                <span>🍌 موز</span>
+                <input type="checkbox" class="addon-select" data-name="موز" data-price="1">
+            </div>
+            <div class="addon-item">
+                <span>🍓 فراولة</span>
+                <input type="checkbox" class="addon-select" data-name="فراولة" data-price="1">
+            </div>
+            <div class="addon-item">
+                <span>🫐 توت أزرق</span>
+                <input type="checkbox" class="addon-select" data-name="توت أزرق" data-price="1">
+            </div>
+            <div class="addon-item">
+                <span>🥜 جرانولا</span>
+                <input type="checkbox" class="addon-select" data-name="جرانولا" data-price="1">
+            </div>
+            <div class="addon-item">
+                <span>🥥 جوز هند</span>
+                <input type="checkbox" class="addon-select" data-name="جوز هند" data-price="1">
+            </div>
+        </div>
 
-<!-- Main Workspace -->
-<main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
-<!-- Products & Menu Section -->
-<div class="lg:col-span-2 space-y-6">
-<!-- Official Menu Image Banner -->
-<div class="bg-white rounded-3xl p-4 border acai-border shadow-sm text-center">
-<h2 class="text-base font-bold acai-primary mb-3 flex items-center justify-center gap-2">
-<span>⭐</span> قائمة المنيو الرسمية المعتمدة
-</h2>
-<div class="w-full max-h-96 bg-rose-50 rounded-2xl overflow-hidden border border-rose-100 inline-block p-2">
-<img src="https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Acai Official Menu" class="w-full h-full object-cover max-h-[350px] rounded-xl">
-</div>
-</div>
+        <button class="btn" onclick="submitOrder()">إتمام الطلب</button>
+    </div>
 
-<!-- Category Tabs -->
-<div class="flex gap-2 overflow-x-auto pb-2">
-<button onclick="filterCategory('all')" class="category-btn active px-5 py-2.5 rounded-2xl acai-bg text-white text-sm font-bold whitespace-nowrap shadow-sm transition">جميع المنتجات</button>
-<button onclick="filterCategory('bowls')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">أكواب الأساي الرئيسية</button>
-<button onclick="filterCategory('toppings')" class="category-btn px-5 py-2.5 rounded-2xl bg-white text-slate-600 hover:bg-rose-50 text-sm font-bold whitespace-nowrap border border-rose-100 transition">الإضافات الأخرى (+1 درهم)</button>
-</div>
+    <!-- لوحة الآدمن -->
+    <div id="admin-panel">
+        <div class="admin-content">
+            <button class="close-admin" onclick="closeAdmin()">إغلاق</button>
+            <h2>لوحة إدارة الطلبات</h2>
+            <div id="orders-list">جاري تحميل الطلبات...</div>
+        </div>
+    </div>
 
-<!-- Products Grid -->
-<div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-<!-- Dynamically Rendered Products -->
-</div>
-</div>
+    <script>
+        // إتمام الطلب وإرساله للسيرفر
+        function submitOrder() {
+            let selectedBowls = [];
+            document.querySelectorAll('.bowl-select:checked').forEach(el => {
+                selectedBowls.push({ name: el.dataset.name, price: el.dataset.price });
+            });
 
-<!-- Order Summary & Checkout Section -->
-<div class="bg-white rounded-3xl shadow-sm border acai-border p-5 flex flex-col h-fit sticky top-20">
-<h2 class="text-lg font-bold border-b acai-border pb-3 mb-4 flex items-center justify-between acai-primary">
-<span>ملخص الطلب</span>
-<span id="item-count" class="bg-rose-100 text-[#581c40] text-xs px-3 py-1 rounded-full font-bold">0 عناصر</span>
-</h2>
+            let selectedAddons = [];
+            document.querySelectorAll('.addon-select:checked').forEach(el => {
+                selectedAddons.push({ name: el.dataset.name, price: el.dataset.price });
+            });
 
-<!-- Cart Items -->
-<div id="cart-items" class="space-y-3 max-h-64 overflow-y-auto mb-4 divide-y divide-rose-50">
-<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي أو إضافة!</p>
-</div>
+            if (selectedBowls.length === 0) {
+                alert('الرجاء اختيار حجم أساي واحد على الأقل.');
+                return;
+            }
 
-<!-- Total Calculation -->
-<div class="border-t acai-border pt-4 space-y-2 text-sm">
-<div class="flex justify-between text-slate-600">
-<span>المجموع الفرعي:</span>
-<span id="subtotal">0.00 درهم</span>
-</div>
-<div class="flex justify-between text-slate-600">
-<span>الضريبة:</span>
-<span>0.00 درهم</span>
-</div>
-<div class="flex justify-between text-lg font-black acai-primary border-t acai-border pt-2 mt-2">
-<span>الإجمالي النهائي:</span>
-<span id="total">0.00 درهم</span>
-</div>
-</div>
+            let orderData = {
+                bowls: selectedBowls,
+                addons: selectedAddons,
+                date: new Date().toLocaleString()
+            };
 
-<!-- Cash Payment Button -->
-<button onclick="submitOrder()" id="checkout-btn" disabled class="mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm">
-إرسال الطلب (دفع نقدي بالبوث) 💵
-</button>
-</div>
-</main>
+            // إرسال الطلب إلى السيرفر (مسار الـ API المفترض في server.js)
+            fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('تم إرسال طلبك بنجاح!');
+                location.reload();
+            })
+            .catch(err => {
+                alert('حدث خطأ أثناء إرسال الطلب، تأكد من تشغيل السيرفر.');
+            });
+        }
 
-<!-- Admin Approval Prompt Modal -->
-<div id="admin-approval-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-<div class="bg-slate-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-purple-700">
-<h3 class="text-lg font-bold text-purple-300 mb-2">👮‍♂️ موافقة الآدمن على الطلب</h3>
-<p class="text-xs text-slate-400 mb-4">أدخل كود الاعتماد (<span class="text-amber-400 font-bold">5</span>) للموافقة على الطلب وتحويل حالته إلى تمت الموافقة:</p>
-<input type="password" id="admin-approval-code" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-4 focus:outline-none focus:border-purple-500" placeholder="أدخل الكود هنا">
-<div class="flex gap-2">
-<button onclick="closeAdminApprovalModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-3 rounded-2xl font-bold text-xs transition">إلغاء</button>
-<button onclick="confirmAdminApproval()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold text-xs transition shadow-md">موافقة نهائية</button>
-</div>
-</div>
-</div>
+        // فتح لوحة الآدمن بكلمة السر 1234
+        function openAdminLogin() {
+            let pass = prompt('الرجاء إدخال كلمة السر لصفحة الآدمن:');
+            if (pass === '1234') {
+                document.getElementById('admin-panel').style.display = 'flex';
+                fetchOrders();
+            } else if (pass !== null) {
+                alert('كلمة السر غير صحيحة!');
+            }
+        }
 
-<!-- Loyalty Card Modal -->
-<div id="loyalty-modal" class="fixed inset-0 bg-[#581c40]/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-<div class="bg-gradient-to-br from-[#581c40] via-[#6b234f] to-[#3a1129] text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden border border-rose-300/30">
-<div class="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
-<div class="flex justify-between items-start mb-6 relative z-10">
-<div>
-<span class="text-xs uppercase tracking-wider bg-amber-400 text-indigo-950 font-black px-3 py-1 rounded-full shadow-sm">برنامج الولاء VIP</span>
-<h3 class="text-2xl font-black mt-2">بطاقة مكافآت الأساي</h3>
-</div>
-<button onclick="toggleLoyaltyModal()" class="text-white/80 hover:text-white text-xl font-bold bg-white/10 w-9 h-9 rounded-full flex items-center justify-center transition">✕</button>
-</div>
-<div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/20 relative z-10">
-<div class="flex justify-between items-center mb-1">
-<span class="text-sm text-white/90 font-semibold">حالة الختم الحالي:</span>
-<span id="loyalty-card-points" class="text-2xl font-black text-amber-300">0 من 3</span>
-</div>
-<p class="text-xs text-amber-200/90 font-bold mt-1">✨ تطلب 3 مرات أي نوع، وفي المرة الرابعة يحصل العميل على حجم كبير مجاناً!</p>
-</div>
-<div class="mb-6 relative z-10">
-<p class="text-xs font-semibold mb-3 text-white/80">أختام الطلبات:</p>
-<div id="stamps-grid" class="grid grid-cols-4 gap-3"></div>
-</div>
-<button onclick="toggleLoyaltyModal()" class="w-full bg-white text-[#581c40] py-3.5 rounded-2xl font-bold hover:bg-rose-50 transition relative z-10 shadow-lg">إغلاق البطاقة</button>
-</div>
-</div>
+        function closeAdmin() {
+            document.getElementById('admin-panel').style.display = 'none';
+        }
 
-<!-- Success / Pending Order Modal -->
-<div id="success-modal" class="fixed inset-0 bg-[#581c40]/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-<div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border acai-border">
-<div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">⏳</div>
-<h3 class="text-xl font-bold acai-primary mb-1">تم إرسال طلبك بنجاح!</h3>
-<p class="text-sm text-slate-500 mb-4">طلبك حالياً **معلق** بانتظار موافقة الآدمن بالبوث.</p>
-<div id="receipt-details" class="bg-rose-50/50 p-3 rounded-2xl text-right text-xs mb-4 border acai-border space-y-1"></div>
-<button onclick="closeSuccessModal()" class="w-full acai-bg text-white py-3.5 rounded-2xl font-bold transition shadow-md hover:opacity-95">حسناً</button>
-</div>
-</div>
-
-<!-- Application Logic & Real-time Socket.io -->
-<script>
-const socket = io();
-
-socket.on('connect', () => {
-const statusEl = document.getElementById('connection-status');
-statusEl.className = "text-[10px] bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-bold flex items-center gap-1";
-statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> متصل بالسحاب`;
-});
-
-socket.on('disconnect', () => {
-const statusEl = document.getElementById('connection-status');
-statusEl.className = "text-[10px] bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full font-bold flex items-center gap-1";
-statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> انقطع الاتصال`;
-});
-
-socket.on('init_data', (data) => {
-adminOrders = data.orders;
-totalSales = data.totalSales;
-updateAdminDashboard();
-});
-
-socket.on('update_orders', (data) => {
-adminOrders = data.orders;
-totalSales = data.totalSales;
-updateAdminDashboard();
-});
-
-socket.on('approval_result', (res) => {
-if (res.success) {
-closeAdminApprovalModal();
-alert('✅ ' + res.message);
-} else {
-alert('⚠️ ' + res.message);
-}
-});
-
-const products = [
-{ id: 1, name: 'أساي مقاس صغير', category: 'bowls', price: 3.00, image: 'https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'كوب أساي طازج - مقاس صغير' },
-{ id: 2, name: 'أساي مقاس كبير', category: 'bowls', price: 5.00, image: 'https://images.pexels.com/photos/8992928/pexels-photo-8992928.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'كوب أساي مشبع - مقاس كبير' },
-{ id: 3, name: 'موز', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/2872755/pexels-photo-2872755.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة شرائح موز طازجة' },
-{ id: 4, name: 'فراولة', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/934066/pexels-photo-934066.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة قطع فراولة طازجة' },
-{ id: 5, name: 'توت أزرق', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/70862/pexels-photo-70862.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة توت أزرق طبيعي' },
-{ id: 6, name: 'جرانولا', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/1359328/pexels-photo-1359328.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة جرانولا مقرمشة' },
-{ id: 7, name: 'جوز هند', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/1414651/pexels-photo-1414651.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة جوز هند طازج' }
-];
-
-let cart = [];
-let currentCategory = 'all';
-let loyaltyPoints = 0; 
-let adminOrders = [];
-let totalSales = 0;
-let selectedOrderIdForApproval = null;
-
-window.onload = function() {
-renderProducts();
-renderStamps();
-};
-
-function openSecretAdminLogin() {
-document.getElementById('admin-pin-input').value = '';
-document.getElementById('admin-login-error').classList.add('hidden');
-document.getElementById('admin-login-modal').classList.remove('hidden');
-}
-
-function closeAdminLoginModal() {
-document.getElementById('admin-login-modal').classList.add('hidden');
-}
-
-function verifyAdminPin() {
-const pin = document.getElementById('admin-pin-input').value;
-if (pin === '1234') {
-closeAdminLoginModal();
-toggleAdminPanel();
-} else {
-document.getElementById('admin-login-error').classList.remove('hidden');
-}
-}
-
-function toggleAdminPanel() {
-const panel = document.getElementById('admin-panel');
-panel.classList.toggle('hidden');
-if (!panel.classList.contains('hidden')) {
-window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-}
-
-function renderProducts() {
-const grid = document.getElementById('products-grid');
-grid.innerHTML = '';
-const filtered = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
-filtered.forEach(product => {
-const card = document.createElement('div');
-card.className = 'bg-white border acai-border rounded-3xl p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer group overflow-hidden';
-card.onclick = () => addToCart(product.id);
-card.innerHTML = `
-<div>
-<div class="w-full h-36 bg-rose-50 rounded-2xl overflow-hidden mb-3 border border-rose-100">
-<img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-</div>
-<h3 class="font-bold acai-primary text-sm mb-1">${product.name}</h3>
-<p class="text-xs text-slate-400 mb-2">${product.desc}</p>
-</div>
-<div class="flex justify-between items-center mt-2 pt-3 border-t border-rose-50">
-<span class="font-black acai-primary text-base">${product.price.toFixed(2)} درهم</span>
-<button class="bg-rose-100 text-[#581c40] text-xs px-3.5 py-2 rounded-xl font-bold group-hover:bg-[#581c40] group-hover:text-white transition shadow-sm">إضافة</button>
-</div>
-`;
-grid.appendChild(card);
-});
-}
-
-function filterCategory(category) {
-currentCategory = category;
-document.querySelectorAll('.category-btn').forEach(btn => {
-btn.classList.remove('acai-bg', 'text-white', 'shadow-sm');
-btn.classList.add('bg-white', 'text-slate-600', 'border', 'border-rose-100');
-});
-event.target.classList.remove('bg-white', 'text-slate-600', 'border', 'border-rose-100');
-event.target.classList.add('acai-bg', 'text-white', 'shadow-sm');
-renderProducts();
-}
-
-function addToCart(productId) {
-const product = products.find(p => p.id === productId);
-const existing = cart.find(item => item.id === productId);
-if (existing) {
-existing.quantity += 1;
-} else {
-cart.push({ ...product, quantity: 1 });
-}
-updateCartUI();
-}
-
-function updateQuantity(productId, delta) {
-const item = cart.find(i => i.id === productId);
-if (item) {
-item.quantity += delta;
-if (item.quantity <= 0) {
-cart = cart.filter(i => i.id !== productId);
-}
-}
-updateCartUI();
-}
-
-function updateCartUI() {
-const container = document.getElementById('cart-items');
-const itemCountEl = document.getElementById('item-count');
-const subtotalEl = document.getElementById('subtotal');
-const totalEl = document.getElementById('total');
-const checkoutBtn = document.getElementById('checkout-btn');
-container.innerHTML = '';
-
-if (cart.length === 0) {
-container.innerHTML = `<p class="text-slate-400 text-center py-6 text-sm">السلة فارغة، اختر أساي أو إضافة!</p>`;
-itemCountEl.innerText = `0 عناصر`;
-subtotalEl.innerText = `0.00 درهم`;
-totalEl.innerText = `0.00 درهم`;
-checkoutBtn.disabled = true;
-checkoutBtn.className = "mt-6 w-full bg-slate-200 text-slate-400 py-3.5 rounded-2xl font-bold cursor-not-allowed transition shadow-sm";
-return;
-}
-
-let totalItems = 0;
-let subtotal = 0;
-cart.forEach(item => {
-totalItems += item.quantity;
-subtotal += item.price * item.quantity;
-const row = document.createElement('div');
-row.className = 'py-2.5 flex justify-between items-center';
-row.innerHTML = `
-<div class="flex-grow">
-<h4 class="text-xs font-bold acai-primary">${item.name}</h4>
-<span class="text-xs text-rose-500 font-bold">${(item.price * item.quantity).toFixed(2)} درهم</span>
-</div>
-<div class="flex items-center gap-2 bg-rose-50 rounded-xl p-1 border acai-border">
-<button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">-</button>
-<span class="text-xs font-bold w-4 text-center acai-primary">${item.quantity}</span>
-<button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 bg-white rounded-lg text-slate-700 font-bold text-xs shadow-sm flex items-center justify-center">+</button>
-</div>
-`;
-container.appendChild(row);
-});
-
-itemCountEl.innerText = `${totalItems} عناصر`;
-subtotalEl.innerText = `${subtotal.toFixed(2)} درهم`;
-totalEl.innerText = `${subtotal.toFixed(2)} درهم`;
-checkoutBtn.disabled = false;
-checkoutBtn.className = "mt-6 w-full acai-bg hover:opacity-95 text-white py-3.5 rounded-2xl font-bold transition shadow-md cursor-pointer";
-}
-
-function submitOrder() {
-const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-const newOrder = {
-id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
-items: [...cart],
-total: total,
-status: 'pending',
-time: new Date().toLocaleTimeString('ar-AE')
-};
-
-// إرسال الطلب للسيرفر السحابي لحظياً
-socket.emit('new_order', newOrder);
-
-let receiptHtml = `<div class="font-bold text-slate-700 border-b acai-border pb-1 mb-1">تفاصيل الطلب المعلق</div>`;
-cart.forEach(item => {
-receiptHtml += `<div class="flex justify-between"><span>${item.name} (x${item.quantity})</span><span>${(item.price * item.quantity).toFixed(2)} د.إ</span></div>`;
-});
-receiptHtml += `<div class="border-t acai-border pt-1 mt-1 font-bold flex justify-between acai-primary"><span>الإجمالي:</span><span>${total.toFixed(2)} د.إ</span></div>`;
-
-document.getElementById('receipt-details').innerHTML = receiptHtml;
-
-cart = [];
-updateCartUI();
-document.getElementById('success-modal').classList.remove('hidden');
-
-loyaltyPoints++;
-if (loyaltyPoints > 3) loyaltyPoints = 0;
-document.getElementById('loyalty-points').innerText = loyaltyPoints;
-document.getElementById('loyalty-card-points').innerText = `${loyaltyPoints} من 3`;
-renderStamps();
-}
-
-function promptAdminApproval(orderId) {
-selectedOrderIdForApproval = orderId;
-document.getElementById('admin-approval-code').value = '';
-document.getElementById('admin-approval-modal').classList.remove('hidden');
-}
-
-function closeAdminApprovalModal() {
-document.getElementById('admin-approval-modal').classList.add('hidden');
-selectedOrderIdForApproval = null;
-}
-
-function confirmAdminApproval() {
-const code = document.getElementById('admin-approval-code').value.trim();
-if (selectedOrderIdForApproval) {
-socket.emit('approve_order', { orderId: selectedOrderIdForApproval, code: code });
-}
-}
-
-function updateAdminDashboard() {
-const approvedOrdersCount = adminOrders.filter(o => o.status === 'approved').length;
-document.getElementById('admin-total-orders').innerText = approvedOrdersCount;
-document.getElementById('admin-total-sales').innerText = totalSales.toFixed(2) + ' درهم';
-
-const listContainer = document.getElementById('admin-orders-list');
-listContainer.innerHTML = '';
-if (adminOrders.length === 0) {
-listContainer.innerHTML = `<p class="text-slate-500 text-center py-4">لا توجد طلبات حتى الآن.</p>`;
-return;
-}
-
-adminOrders.forEach(ord => {
-const div = document.createElement('div');
-div.className = 'bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col gap-2';
-const itemsSummary = ord.items.map(i => `${i.name} (x${i.quantity})`).join('، ');
-
-let statusBadge = ord.status === 'approved' 
-? `<span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold">تمت الموافقة ✓</span>` 
-: `<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">معلق ⏳</span>`;
-
-let actionButton = ord.status === 'pending'
-? `<button onclick="promptAdminApproval('${ord.id}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] transition">موافقة وإدخال الكود (5)</button>`
-: `<span class="text-emerald-400 text-[11px] font-bold">مكتمل ومعتمد</span>`;
-
-div.innerHTML = `
-<div class="flex justify-between items-center font-bold text-slate-200">
-<span>طلب #${ord.id} (${ord.time})</span>
-<div class="flex items-center gap-2">
-<span class="text-emerald-400">${ord.total.toFixed(2)} درهم</span>
-${statusBadge}
-</div>
-</div>
-<div class="text-slate-400 text-[11px]">الأصناف: ${itemsSummary}</div>
-<div class="flex justify-between items-center border-t border-slate-800 pt-1 mt-1">
-<span class="text-[10px] text-slate-400">الدفع: نقدي عند الاستلام من البوث</span>
-${actionButton}
-</div>
-`;
-listContainer.appendChild(div);
-});
-}
-
-function closeSuccessModal() {
-document.getElementById('success-modal').classList.add('hidden');
-}
-
-function toggleLoyaltyModal() {
-document.getElementById('loyalty-modal').classList.toggle('hidden');
-}
-
-function renderStamps() {
-const grid = document.getElementById('stamps-grid');
-grid.innerHTML = '';
-for (let i = 1; i <= 4; i++) {
-const stamp = document.createElement('div');
-const isStamped = i <= loyaltyPoints;
-const isReward = i === 4;
-
-stamp.className = `h-14 rounded-2xl flex flex-col items-center justify-center font-bold text-xs border transition-all ${
-isStamped 
-? 'bg-amber-400 text-indigo-950 border-amber-300 shadow-md scale-105' 
-: isReward 
-? 'bg-white/10 border-dashed border-amber-300/60 text-amber-300' 
-: 'bg-white/5 border-white/10 text-white/40'
-}`;
-
-if (isStamped) {
-stamp.innerHTML = `<span class="text-base">🍇</span><span class="text-[10px]">ختم ${i}</span>`;
-} else if (isReward) {
-stamp.innerHTML = `<span class="text-base">🎁</span><span class="text-[9px] font-bold">مجاناً كبير</span>`;
-} else {
-stamp.innerHTML = `<span class="text-sm">${i}</span>`;
-}
-grid.appendChild(stamp);
-}
-}
-</script>
+        // جلب الطلبات من السيرفر لعرضها للآدمن
+        function fetchOrders() {
+            fetch('/api/orders')
+            .then(res => res.json())
+            .then(data => {
+                let listDiv = document.getElementById('orders-list');
+                if (data.length === 0) {
+                    listDiv.innerHTML = '<p>لا توجد طلبات حالياً.</p>';
+                    return;
+                }
+                let html = '<ul>';
+                data.forEach((order, index) => {
+                    html += `<li><strong>طلب #${index + 1}</strong> (${order.date})<br>`;
+                    order.bowls.forEach(b => html += `- ${b.name} (${b.price} درهم)<br>`);
+                    if(order.addons.length > 0) {
+                        html += `إضافات: `;
+                        order.addons.forEach(a => html += `${a.name} `);
+                        html += `<br>`;
+                    }
+                    html += `</li><hr>`;
+                });
+                html += '</ul>';
+                listDiv.innerHTML = html;
+            })
+            .catch(err => {
+                document.getElementById('orders-list').innerHTML = 'فشل جلب الطلبات من السيرفر.';
+            });
+        }
+    </script>
 </body>
 </html>
