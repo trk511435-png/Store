@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acai Bowls - نظام الطلب والكاشير السحابي</title>
+<title>أساي بولة - نظام الطلب والكاشير السحابي</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- استيراد مكتبة السيرفر اللحظي Socket.io -->
+<!-- مكتبة الاتصال اللحظي بالسيرفر السحابي -->
 <script src="/socket.io/socket.io.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -19,6 +19,7 @@ background-color: #fcf8f5;
 </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
+
 <!-- Header & Branding -->
 <header class="bg-white border-b acai-border shadow-sm sticky top-0 z-40">
 <div class="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -50,9 +51,9 @@ background-color: #fcf8f5;
 <h3 class="text-base font-bold text-purple-300">🔐 بوابة المالك المشفرة</h3>
 <button onclick="closeAdminLoginModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
 </div>
-<p class="text-xs text-slate-400 mb-4">أدخل الرمز السري الخاص بالمدير للوصول للوحة المبيعات:</p>
+<p class="text-xs text-slate-400 mb-4">أدخل الرمز السري الخاص بالمدير (الافتراضي: 1234):</p>
 <input type="password" id="admin-pin-input" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-3 focus:outline-none focus:border-purple-500" placeholder="••••">
-<p id="admin-login-error" class="text-xs text-rose-400 mb-3 hidden text-center">الرمز السري غير صحيح! (الافتراضي: 1234)</p>
+<p id="admin-login-error" class="text-xs text-rose-400 mb-3 hidden text-center">الرمز السري غير صحيح!</p>
 <button onclick="verifyAdminPin()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-2xl font-bold transition">دخول لوحة التحكم</button>
 </div>
 </div>
@@ -76,14 +77,14 @@ background-color: #fcf8f5;
 <p id="admin-total-sales" class="text-2xl font-black text-emerald-400">0.00 درهم</p>
 </div>
 <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-<p class="text-xs text-slate-400 mb-1">حالة السيرفر السحابي</p>
+<p class="text-xs text-slate-400 mb-1">حالة السيرفر</p>
 <p class="text-sm font-bold text-emerald-400 flex items-center gap-1 mt-1">
-<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> متصل بالسحاب (Real-time)
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> متصل بالسحاب لحظياً
 </p>
 </div>
 </div>
 <div class="bg-slate-800 rounded-2xl p-4 border border-slate-700">
-<h3 class="text-sm font-bold text-slate-300 mb-3">سجل الطلبات الواردة من العملاء:</h3>
+<h3 class="text-sm font-bold text-slate-300 mb-3">سجل الطلبات الواردة (تتطلب موافقة الآدمن بالكود 5):</h3>
 <div id="admin-orders-list" class="space-y-3 max-h-64 overflow-y-auto text-xs">
 <p class="text-slate-500 text-center py-4">لا توجد طلبات حتى الآن.</p>
 </div>
@@ -101,7 +102,7 @@ background-color: #fcf8f5;
 <span>⭐</span> قائمة المنيو الرسمية المعتمدة
 </h2>
 <div class="w-full max-h-96 bg-rose-50 rounded-2xl overflow-hidden border border-rose-100 inline-block p-2">
-<img src="https://www.sambazon.ae/ar/pages/discover-acai" alt="Acai Official Menu" onerror="this.src='https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=800'" class="w-full h-full object-cover max-h-[350px] rounded-xl">
+<img src="https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Acai Official Menu" class="w-full h-full object-cover max-h-[350px] rounded-xl">
 </div>
 </div>
 
@@ -157,7 +158,7 @@ background-color: #fcf8f5;
 <div id="admin-approval-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-slate-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-purple-700">
 <h3 class="text-lg font-bold text-purple-300 mb-2">👮‍♂️ موافقة الآدمن على الطلب</h3>
-<p class="text-xs text-slate-400 mb-4">أدخل كود الاعتماد (مثال: 5) للموافقة على الطلب وتحويل حالته إلى تمت الموافقة:</p>
+<p class="text-xs text-slate-400 mb-4">أدخل كود الاعتماد (<span class="text-amber-400 font-bold">5</span>) للموافقة على الطلب وتحويل حالته إلى تمت الموافقة:</p>
 <input type="password" id="admin-approval-code" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center font-bold tracking-widest mb-4 focus:outline-none focus:border-purple-500" placeholder="أدخل الكود هنا">
 <div class="flex gap-2">
 <button onclick="closeAdminApprovalModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-3 rounded-2xl font-bold text-xs transition">إلغاء</button>
@@ -203,14 +204,14 @@ background-color: #fcf8f5;
 </div>
 </div>
 
-<!-- Socket.io & Application Logic -->
+<!-- Application Logic & Real-time Socket.io -->
 <script>
 const socket = io();
 
 socket.on('connect', () => {
 const statusEl = document.getElementById('connection-status');
 statusEl.className = "text-[10px] bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-bold flex items-center gap-1";
-statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> متصل سحابياً`;
+statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> متصل بالسحاب`;
 });
 
 socket.on('disconnect', () => {
@@ -241,8 +242,8 @@ alert('⚠️ ' + res.message);
 });
 
 const products = [
-{ id: 1, name: 'أساي مقاس صغير', category: 'bowls', price: 3.00, image: 'https://www.sambazon.ae/ar/pages/discover-acai', desc: 'كوب أساي طازج - مقاس صغير' },
-{ id: 2, name: 'أساي مقاس كبير', category: 'bowls', price: 5.00, image: 'https://www.sambazon.ae/ar/pages/discover-acai', desc: 'كوب أساي مشبع - مقاس كبير' },
+{ id: 1, name: 'أساي مقاس صغير', category: 'bowls', price: 3.00, image: 'https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'كوب أساي طازج - مقاس صغير' },
+{ id: 2, name: 'أساي مقاس كبير', category: 'bowls', price: 5.00, image: 'https://images.pexels.com/photos/8992928/pexels-photo-8992928.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'كوب أساي مشبع - مقاس كبير' },
 { id: 3, name: 'موز', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/2872755/pexels-photo-2872755.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة شرائح موز طازجة' },
 { id: 4, name: 'فراولة', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/934066/pexels-photo-934066.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة قطع فراولة طازجة' },
 { id: 5, name: 'توت أزرق', category: 'toppings', price: 1.00, image: 'https://images.pexels.com/photos/70862/pexels-photo-70862.jpeg?auto=compress&cs=tinysrgb&w=500', desc: 'إضافة توت أزرق طبيعي' },
@@ -301,7 +302,7 @@ card.onclick = () => addToCart(product.id);
 card.innerHTML = `
 <div>
 <div class="w-full h-36 bg-rose-50 rounded-2xl overflow-hidden mb-3 border border-rose-100">
-<img src="${product.image}" alt="${product.name}" onerror="this.src='https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=500'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+<img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
 </div>
 <h3 class="font-bold acai-primary text-sm mb-1">${product.name}</h3>
 <p class="text-xs text-slate-400 mb-2">${product.desc}</p>
@@ -404,6 +405,7 @@ status: 'pending',
 time: new Date().toLocaleTimeString('ar-AE')
 };
 
+// إرسال الطلب للسيرفر السحابي لحظياً
 socket.emit('new_order', newOrder);
 
 let receiptHtml = `<div class="font-bold text-slate-700 border-b acai-border pb-1 mb-1">تفاصيل الطلب المعلق</div>`;
@@ -465,7 +467,7 @@ let statusBadge = ord.status === 'approved'
 : `<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">معلق ⏳</span>`;
 
 let actionButton = ord.status === 'pending'
-? `<button onclick="promptAdminApproval('${ord.id}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] transition">موافقة وإدخال الكود</button>`
+? `<button onclick="promptAdminApproval('${ord.id}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] transition">موافقة وإدخال الكود (5)</button>`
 : `<span class="text-emerald-400 text-[11px] font-bold">مكتمل ومعتمد</span>`;
 
 div.innerHTML = `
